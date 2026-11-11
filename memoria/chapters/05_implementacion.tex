@@ -22,6 +22,11 @@ memoria/            # Fuente LaTeX y anexos
 evidencias/         # Salidas de validaci\'on reproducibles
 \end{lstlisting}
 
+El c\'odigo fuente, las instrucciones de ejecuci\'on y las evidencias no sensibles se publican en el repositorio del proyecto:\newline
+\url{https://github.com/mikel0313/TFM_Ciberseguridad_Copilot}
+
+El repositorio permite revisar la separaci\'on entre cliente, BFF, configuraci\'on del agente, memoria y pruebas. Los archivos de entorno se excluyen del control de versiones; por tanto, ni claves de API, ni secretos de canal, ni transcripciones reales forman parte de la URL anterior ni de las capturas de este documento.
+
 Fijar las versiones de dependencias y conservar un archivo de bloqueo permite repetir la compilaci\'on. Antes de publicar deben ejecutarse auditor\'ias de dependencias y comprobarse que los artefactos no incluyen archivos \texttt{.env}, secretos o datos de pruebas sensibles. El prototipo no usa Docker como requisito de ejecuci\'on, aunque puede contener una configuraci\'on de despliegue posterior.
 
 \section{Configuraci\'on del agente en Copilot Studio}
@@ -85,11 +90,37 @@ return response.json(); // token de vida limitada, no el secreto
 
 El fragmento \ref{lst:token} ilustra el principio, no sustituye las validaciones, registro seguro y control de errores presentes en el c\'odigo. En un despliegue corporativo se a\~nadir\'ia autenticaci\'on Entra ID, autorizaci\'on por rol y un registro de aplicaciones independiente para el canvas web y para el agente, tal como recomienda Microsoft para SSO \cite{copilotSso}.
 
+\section{Canal OpenAI para demostraci\'on local}
+
+Como evidencia ejecutable adicional, el BFF admite un canal OpenAI cuando el propietario configura la clave exclusivamente en su entorno de servidor. El navegador env\'ia a \texttt{/api/chat} solamente el mensaje de la persona usuaria; el BFF valida el origen permitido, limita la frecuencia y comprueba que la entrada tenga entre 1 y 1200 caracteres. A continuaci\'on, el servidor a\~nade unas instrucciones fijas de CiberGu\'ia centradas en orientaci\'on defensiva, privacidad, triaje inicial y rechazo de acciones ofensivas, y solicita la respuesta mediante la API Responses.
+
+La solicitud limita la salida a 600 tokens y usa \texttt{store: false}. La clave no se expone al cliente ni se devuelve en los errores. En esta versi\'on cada consulta se trata de forma independiente: el historial visible sirve a la experiencia de usuario, pero no se reenv\'ia al proveedor. Esta integraci\'on permite demostrar la frontera segura entre navegador, BFF y modelo, pero no sustituye la evaluaci\'on del agente publicado en Copilot Studio ni una auditor\'ia de producci\'on.
+
 \section{Interfaz Angular y experiencia de uso}
 
-La p\'agina inicial contiene tres zonas: explicaci\'on de prop\'osito y l\'imites, tarjetas de consultas de ejemplo y el contenedor de conversaci\'on. Se evita cargar el chat autom\'aticamente sin advertencia para que la persona pueda leer la pol\'itica de datos antes de iniciar una conversaci\'on. El componente muestra el estado de conexi\'on, informa si opera en modo demostraci\'on y permite reiniciar la conversaci\'on local.
+La p\'agina inicial contiene tres zonas: explicaci\'on de prop\'osito y l\'imites, tarjetas de consultas de ejemplo y el contenedor de conversaci\'on. Se evita cargar el chat autom\'aticamente sin advertencia para que la persona pueda leer la pol\'itica de datos antes de iniciar una conversaci\'on. El componente muestra el estado de conexi\'on, informa si opera en modo demostraci\'on o mediante OpenAI y permite reiniciar la conversaci\'on local.
 
 La aplicaci\'on no inserta HTML del modelo mediante APIs que evadan la sanitizaci\'on de Angular. Los enlaces se normalizan y se abren con atributos de seguridad; los datos de feedback se tratan como texto. Se configuran cabeceras de seguridad en el BFF, incluyendo una pol\'itica de seguridad de contenido compatible con los dominios estrictamente necesarios. El CSP definitivo debe validarse en el entorno real porque las URL del canal y de autenticaci\'on son propias del tenant.
+
+La conversaci\'on puede visualizarse integrada en la p\'agina, a pantalla completa o como una ventana flotante en la esquina inferior derecha. En este \`ultimo modo el contenedor se ajusta al tama\~no visible, el contenido largo se parte de forma segura y aparecen acciones expl\'icitas para ampliar la ventana o cerrarla. Esta decisi\'on permite inspeccionar una respuesta sin perder el contexto de la p\'agina.
+
+\subsection{Evidencia visual de la implementaci\'on}
+
+Las Figuras~\ref{fig:interfaz-principal} y \ref{fig:chat-configurado} muestran la versi\'on ejecutada localmente durante la revalidaci\'on. Se han empleado un escenario de phishing sint\'etico y mensajes no sensibles; no se incluyen claves, tokens ni datos personales. La ejecuci\'on de una consulta de prueba obtuvo una respuesta del canal OpenAI a trav\'es del BFF. Los resultados HTTP y las pruebas automatizadas correspondientes se documentan en el Cap\'itulo~\ref{chap:validacion}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.39\textheight,keepaspectratio]{figuras/interfaz-principal.png}
+\caption{Vista inicial de CiberGu\'ia en ejecuci\'on local. Se muestran el estado del canal OpenAI, los principios de dise\~no y el acceso al asistente. La captura no contiene secretos ni datos personales.}
+\label{fig:interfaz-principal}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,height=0.41\textheight,keepaspectratio]{figuras/chat-configurado.png}
+\caption{Zona de conversaci\'on configurada en ejecuci\'on local. La interfaz informa del canal, advierte sobre privacidad, propone escenarios guiados y ofrece vistas integrada, a pantalla completa y flotante.}
+\label{fig:chat-configurado}
+\end{figure}
 
 \section{Despliegue y operaci\'on}
 
