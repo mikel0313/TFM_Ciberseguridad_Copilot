@@ -4,10 +4,15 @@
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 48 48" fill="none"><path d="M24 4 40 10v11c0 10.4-6.8 19-16 23-9.2-4-16-12.6-16-23V10L24 4Z" stroke="currentColor" stroke-width="3"/><path d="M16 24h16M24 16v16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
       </span>
-      <span><strong>CiberGuía</strong><small>Asistente de ciberseguridad</small></span>
+      <span><strong>CiberGuía</strong><small>Centro de decisión cibersegura</small></span>
     </a>
+
+    <nav class="topbar-nav" aria-label="Navegación principal">
+      <a href="#asistente">Asistente</a>
+      <a href="#fuentes">Método</a>
+    </nav>
+
     <div class="topbar-actions">
-      <span class="project-label">TFM · Prototipo evaluable</span>
       <span class="status-pill" [class.live]="mode() === 'directline' || mode() === 'openai'" [class.loading]="mode() === 'loading'">
         <i aria-hidden="true"></i>{{ statusText() }}
       </span>
@@ -16,83 +21,162 @@
 
   <section class="hero" id="inicio" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <p class="eyebrow"><span></span>Decisiones con contexto, no con certezas fingidas</p>
-      <h1 id="hero-title">Orientación cibersegura,<br><em>trazable y humana.</em></h1>
-      <p class="hero-text">Un asistente conversacional para el análisis inicial de incidentes, sustentado en fuentes institucionales y diseñado para mostrar sus límites.</p>
+      <p class="eyebrow"><span></span>Asistencia responsable para el SOC</p>
+      <h1 id="hero-title">Menos ruido.<br><em>Mejores decisiones.</em></h1>
+      <p class="hero-text">CiberGuía convierte una alerta incierta en un siguiente paso claro, trazable y proporcionado. Diseñada para orientar, no para tomar el control.</p>
+
       <div class="hero-actions">
-        <button type="button" class="primary-action" (click)="scrollToSources()">Ver fuentes y alcance <span aria-hidden="true">↓</span></button>
-        <p><strong>Privacidad por diseño.</strong> No compartas contraseñas, tokens ni datos personales.</p>
+        <button type="button" class="primary-action" (click)="openFullscreenChat()">
+          Abrir CiberGuía <span aria-hidden="true">↗</span>
+        </button>
+        <button type="button" class="secondary-action" (click)="focusAssistant()">Probar un escenario</button>
       </div>
+
+      <dl class="hero-proof" aria-label="Principios de CiberGuía">
+        <div><dt>01</dt><dd>Hechos antes<br>que hipótesis</dd></div>
+        <div><dt>02</dt><dd>Privacidad<br>por diseño</dd></div>
+        <div><dt>03</dt><dd>Escalado<br>responsable</dd></div>
+      </dl>
     </div>
+
     <div class="hero-visual" aria-hidden="true">
-      <div class="radar-grid"></div>
-      <div class="orb orb-main"><svg viewBox="0 0 48 48" fill="none"><path d="M24 4 40 10v11c0 10.4-6.8 19-16 23-9.2-4-16-12.6-16-23V10L24 4Z" stroke="currentColor" stroke-width="2.5"/><path d="m17 24 4.5 4.5L31 19" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="signal signal-one"></div><div class="signal signal-two"></div><div class="signal signal-three"></div>
-      <div class="visual-card source-card"><span>FUENTE</span><strong>INCIBE</strong><i>verificada</i></div>
-      <div class="visual-card score-card"><span>TRAZABILIDAD</span><strong>Alta</strong><div><b></b><b></b><b></b><b></b></div></div>
+      <div class="hero-grid"></div>
+      <div class="visual-orbit orbit-one"></div>
+      <div class="visual-orbit orbit-two"></div>
+      <div class="hero-glow"></div>
+      <div class="threat-card card-primary">
+        <div class="card-kicker"><span class="live-dot"></span>SEÑAL DETECTADA</div>
+        <strong>Acceso anómalo</strong>
+        <p>Analizando contexto, identidad y actividad posterior.</p>
+        <div class="confidence"><span>CONFIANZA</span><b><i></i></b><em>Alta</em></div>
+      </div>
+      <div class="threat-card card-secondary">
+        <span>FUENTES ACTIVAS</span>
+        <strong>INCIBE · NIST · ENISA</strong>
+        <i>Razonamiento con límites explícitos</i>
+      </div>
+      <div class="shield-orb">
+        <svg viewBox="0 0 72 72" fill="none"><path d="M36 7 59 15v15c0 15-9.8 27.2-23 33-13.2-5.8-23-18-23-33V15L36 7Z" stroke="currentColor" stroke-width="2.2"/><path d="m25.5 36 6.7 6.7L47.5 27.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
     </div>
   </section>
 
-  <section class="experience" aria-labelledby="assistant-title">
+  <section class="trust-ribbon" aria-label="Controles del asistente">
+    <div><span class="ribbon-icon">✦</span><p><strong>Contexto verificable</strong><small>Distingue observaciones, hipótesis y acciones.</small></p></div>
+    <div><span class="ribbon-icon">⌁</span><p><strong>Sesión protegida</strong><small>La clave de API permanece en el servidor.</small></p></div>
+    <div><span class="ribbon-icon">↗</span><p><strong>Control del analista</strong><small>Sin ejecución automática ni certezas fingidas.</small></p></div>
+  </section>
+
+  <section class="experience" id="asistente" aria-labelledby="assistant-title">
     <aside class="context-panel">
       <div>
-        <p class="eyebrow"><span></span>Contexto de la sesión</p>
-        <h2 id="assistant-title">Asistente de análisis</h2>
+        <p class="eyebrow"><span></span>Centro de mando</p>
+        <h2 id="assistant-title">Piensa con<br><em>mejor contexto.</em></h2>
+        <p class="context-intro">Empieza con el escenario que tienes delante. CiberGuía te ayuda a ordenar la información antes de actuar.</p>
       </div>
+
       <dl class="session-facts">
         <div><dt>Canal</dt><dd>{{ mode() === 'openai' ? 'OpenAI · Responses API' : mode() === 'directline' ? 'Copilot Studio · Direct Line' : 'Simulación local controlada' }}</dd></div>
-        <div><dt>Sesión</dt><dd>{{ mode() === 'openai' ? 'Clave protegida en el BFF' : mode() === 'directline' ? 'Token temporal en memoria' : 'Sin conexión a servicios externos' }}</dd></div>
-        <div><dt>Propósito</dt><dd>Orientación y evaluación, no ejecución automática</dd></div>
+        <div><dt>Sesión</dt><dd>{{ mode() === 'openai' ? 'Clave protegida en el BFF' : mode() === 'directline' ? 'Token temporal en memoria' : 'Sin conexión externa' }}</dd></div>
+        <div><dt>Alcance</dt><dd>Orientación inicial, no ejecución automática</dd></div>
       </dl>
-      <div class="guardrail">
-        <span class="guardrail-icon" aria-hidden="true">!</span>
-        <p><strong>Límite operativo</strong> Contrasta toda recomendación con el procedimiento de tu organización antes de actuar.</p>
+
+      <div class="scenario-prompt">
+        <span>ESCENARIOS GUIADOS</span>
+        <button type="button" (click)="useExample(examples[0])">Phishing <i aria-hidden="true">→</i></button>
+        <button type="button" (click)="useExample(examples[1])">Ransomware <i aria-hidden="true">→</i></button>
+        <button type="button" (click)="useExample(examples[2])">Identidad <i aria-hidden="true">→</i></button>
       </div>
-      <button type="button" class="text-button" (click)="retryConnection()" [disabled]="mode() === 'loading'">↻ Reintentar canal seguro</button>
+
+      <button type="button" class="reconnect-button" (click)="retryConnection()" [disabled]="mode() === 'loading'">
+        <span aria-hidden="true">↻</span> Reintentar conexión
+      </button>
     </aside>
 
-    <div class="chat-card">
-      <header class="chat-header">
-        <div class="chat-title"><span class="assistant-avatar" aria-hidden="true">CG</span><div><strong>CiberGuía</strong><small>{{ mode() === 'openai' ? 'Canal OpenAI configurado' : mode() === 'directline' ? 'Asistente conectado' : 'Entorno de demostración' }}</small></div></div>
-        <span class="mode-chip" [class.online]="mode() === 'directline' || mode() === 'openai'">{{ mode() === 'openai' ? 'OPENAI' : mode() === 'directline' ? 'DIRECT LINE' : mode() === 'loading' ? 'CONECTANDO' : 'DEMO' }}</span>
-      </header>
+    <div class="chat-stage" [class.is-fullscreen]="chatView() === 'fullscreen'" [class.is-compact]="chatView() === 'compact'">
+      <button *ngIf="chatView() === 'fullscreen'" class="view-backdrop" type="button" (click)="setChatView('embedded')" aria-label="Cerrar vista de pantalla completa"></button>
 
-      <div class="connection-note" [class.is-demo]="mode() === 'demo' || mode() === 'loading'" aria-live="polite">
-        <span aria-hidden="true">{{ mode() === 'directline' || mode() === 'openai' ? '✓' : 'ⓘ' }}</span>
-        <p>{{ connectionDetail() || 'Estableciendo conexión protegida…' }}</p>
-      </div>
+      <article class="chat-card" [attr.aria-label]="chatView() === 'compact' ? 'Ventana flotante de CiberGuía' : 'Conversación con CiberGuía'">
+        <header class="chat-header">
+          <div class="chat-title">
+            <span class="assistant-avatar" aria-hidden="true">CG</span>
+            <div>
+              <strong>CiberGuía</strong>
+              <small>{{ mode() === 'openai' ? 'Canal OpenAI configurado' : mode() === 'directline' ? 'Asistente conectado' : 'Entorno de demostración' }}</small>
+            </div>
+          </div>
 
-      <div class="chat-area">
-        <div *ngIf="mode() === 'directline'; else textConversation" #webchatHost class="webchat-host" aria-label="Conversación con el asistente"></div>
-        <ng-template #textConversation>
-          <div class="demo-conversation" aria-live="polite">
-            <article *ngFor="let message of messages" class="message" [class.user-message]="message.author === 'user'">
-              <span class="message-avatar" aria-hidden="true">{{ message.author === 'assistant' ? 'CG' : 'TÚ' }}</span>
-              <div class="message-body">
-                <p>{{ message.text }}</p>
-                <div *ngIf="message.references?.length" class="references"><span>Referencias</span><a *ngFor="let reference of message.references" href="#fuentes">{{ reference }}</a></div>
-              </div>
-            </article>
-            <article *ngIf="isSending()" class="message">
-              <span class="message-avatar" aria-hidden="true">CG</span>
-              <div class="message-body"><p>Analizando la consulta…</p></div>
-            </article>
+          <div class="chat-header-actions">
+            <span class="mode-chip" [class.online]="mode() === 'directline' || mode() === 'openai'">{{ mode() === 'openai' ? 'OPENAI' : mode() === 'directline' ? 'DIRECT LINE' : mode() === 'loading' ? 'CONECTANDO' : 'DEMO' }}</span>
+            <div *ngIf="chatView() === 'compact'" class="compact-window-actions" aria-label="Acciones de la ventana flotante">
+              <button type="button" class="compact-expand" title="Abrir a pantalla completa" aria-label="Abrir la conversación a pantalla completa" (click)="setChatView('fullscreen')">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 3H3v4M13 3h4v4M17 13v4h-4M3 13v4h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="compact-close" title="Cerrar ventana flotante" aria-label="Cerrar la ventana flotante y volver a la vista integrada" (click)="setChatView('embedded')">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+            <div class="view-controls" aria-label="Modo de vista del asistente">
+              <button type="button" title="Vista integrada" aria-label="Vista integrada" [class.is-active]="chatView() === 'embedded'" [attr.aria-pressed]="chatView() === 'embedded'" (click)="setChatView('embedded')">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 7h8M6 10h8M6 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+              <button type="button" title="Vista de pantalla completa" aria-label="Vista de pantalla completa" [class.is-active]="chatView() === 'fullscreen'" [attr.aria-pressed]="chatView() === 'fullscreen'" (click)="setChatView('fullscreen')">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 3H3v4M13 3h4v4M17 13v4h-4M3 13v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" title="Abrir como ventana flotante" aria-label="Abrir como ventana flotante abajo a la derecha" [class.is-active]="chatView() === 'compact'" [attr.aria-pressed]="chatView() === 'compact'" (click)="setChatView('compact')">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M12 12h4v4M16 12l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
           </div>
-          <div class="example-row" aria-label="Preguntas de ejemplo">
-            <button *ngFor="let example of examples" type="button" [disabled]="mode() === 'loading' || mode() === 'directline' || isSending()" (click)="useExample(example)">{{ example }}</button>
-          </div>
-          <form class="demo-composer" (ngSubmit)="sendMessage()">
-            <label for="demo-question" class="sr-only">Escribe una consulta para el asistente</label>
-            <input id="demo-question" [(ngModel)]="draft" name="question" maxlength="1200" autocomplete="off" placeholder="Describe un escenario de ciberseguridad…" [disabled]="mode() === 'loading' || mode() === 'directline' || isSending()">
-            <button type="submit" [disabled]="!draft.trim() || mode() === 'loading' || mode() === 'directline' || isSending()" aria-label="Enviar consulta">↑</button>
-          </form>
-        </ng-template>
-      </div>
+        </header>
+
+        <div class="connection-note" [class.is-demo]="mode() === 'demo' || mode() === 'loading'" aria-live="polite">
+          <span aria-hidden="true">{{ mode() === 'directline' || mode() === 'openai' ? '✓' : 'ⓘ' }}</span>
+          <p>{{ connectionDetail() || 'Estableciendo conexión protegida…' }}</p>
+          <button *ngIf="chatView() === 'fullscreen'" type="button" class="restore-view" (click)="setChatView('embedded')">Restaurar</button>
+        </div>
+
+        <div class="chat-area">
+          <div *ngIf="mode() === 'directline'; else textConversation" #webchatHost class="webchat-host" aria-label="Conversación con el asistente"></div>
+          <ng-template #textConversation>
+            <div class="demo-conversation" aria-live="polite">
+              <div class="conversation-label"><span></span>CONVERSACIÓN PROTEGIDA</div>
+              <article *ngFor="let message of messages" class="message" [class.user-message]="message.author === 'user'">
+                <span class="message-avatar" aria-hidden="true">{{ message.author === 'assistant' ? 'CG' : 'TÚ' }}</span>
+                <div class="message-body">
+                  <p>{{ message.text }}</p>
+                  <div *ngIf="message.references?.length" class="references"><span>Referencias</span><a *ngFor="let reference of message.references" href="#fuentes">{{ reference }}</a></div>
+                </div>
+              </article>
+              <article *ngIf="isSending()" class="message thinking-message">
+                <span class="message-avatar" aria-hidden="true">CG</span>
+                <div class="message-body"><p><i></i><i></i><i></i> Analizando el contexto…</p></div>
+              </article>
+            </div>
+
+            <div class="example-row" aria-label="Preguntas de ejemplo">
+              <button *ngFor="let example of examples" type="button" [disabled]="mode() === 'loading' || mode() === 'directline' || isSending()" (click)="useExample(example)">{{ example }}</button>
+            </div>
+
+            <form class="demo-composer" (ngSubmit)="sendMessage()">
+              <label for="assistant-question" class="sr-only">Escribe una consulta para el asistente</label>
+              <input id="assistant-question" [(ngModel)]="draft" name="question" maxlength="1200" autocomplete="off" placeholder="Describe la señal, activo o duda que necesitas analizar…" [disabled]="mode() === 'loading' || mode() === 'directline' || isSending()">
+              <button type="submit" [disabled]="!draft.trim() || mode() === 'loading' || mode() === 'directline' || isSending()" aria-label="Enviar consulta">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m4 10 11-6-3.3 12-2.3-4-5.4-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m9 12 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </button>
+            </form>
+            <p class="composer-note"><span>⌁</span> No incluyas secretos, credenciales ni datos personales.</p>
+          </ng-template>
+        </div>
+      </article>
     </div>
   </section>
 
   <section class="method" id="fuentes" aria-labelledby="method-title">
-    <div class="method-heading"><p class="eyebrow"><span></span>Marco de confianza</p><h2 id="method-title">Cada respuesta debe poder <em>explicarse.</em></h2></div>
+    <div class="method-heading">
+      <div><p class="eyebrow"><span></span>Marco de confianza</p><h2 id="method-title">Una respuesta útil<br><em>debe poder explicarse.</em></h2></div>
+      <p>La interfaz no pretende resolverlo todo. Hace visible el criterio, los límites y el siguiente paso más seguro.</p>
+    </div>
     <div class="method-grid">
       <article><span class="method-number">01</span><h3>Fuentes seleccionadas</h3><p>Conocimiento procedente de organismos y documentación técnica reconocidos, no de afirmaciones sin procedencia.</p></article>
       <article><span class="method-number">02</span><h3>Separación de hechos</h3><p>El diseño distingue evidencia, hipótesis y recomendación para no convertir inferencias en certezas.</p></article>
@@ -106,5 +190,8 @@
     </div>
   </section>
 
-  <footer><span>© 2026 · Prototipo académico de TFM</span><span>Diseñado para evaluación de precisión, trazabilidad y utilidad</span></footer>
+  <footer>
+    <span>© 2026 · CiberGuía · Prototipo académico de TFM</span>
+    <span>Diseñado para precisión, trazabilidad y utilidad humana</span>
+  </footer>
 </main>

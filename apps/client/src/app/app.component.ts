@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { AfterViewInit, Component, ElementRef, ViewChild, signal } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
 import { ApiService } from "./api.service";
@@ -7,6 +7,7 @@ import { WebChatService } from "./web-chat.service";
 
 type ExperienceMode = "loading" | "directline" | "openai" | "demo";
 type MessageAuthor = "assistant" | "user";
+type ChatView = "embedded" | "fullscreen" | "compact";
 
 interface ConversationMessage {
   id: number;
@@ -25,6 +26,7 @@ export class AppComponent implements AfterViewInit {
   @ViewChild("webchatHost") webchatHost?: ElementRef<HTMLElement>;
 
   readonly mode = signal<ExperienceMode>("loading");
+  readonly chatView = signal<ChatView>("embedded");
   readonly statusText = signal("Comprobando la disponibilidad del canal…");
   readonly connectionDetail = signal("");
   readonly isSending = signal(false);
@@ -61,6 +63,26 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     void this.initializeChannel();
+  }
+
+  @HostListener("document:keydown.escape")
+  onEscape(): void {
+    if (this.chatView() !== "embedded") this.setChatView("embedded");
+  }
+
+  setChatView(view: ChatView): void {
+    this.chatView.set(view);
+  }
+
+  openFullscreenChat(): void {
+    this.setChatView("fullscreen");
+    setTimeout(() => document.getElementById("assistant-question")?.focus(), 0);
+  }
+
+  focusAssistant(): void {
+    this.setChatView("embedded");
+    document.getElementById("asistente")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => document.getElementById("assistant-question")?.focus(), 360);
   }
 
   async retryConnection(): Promise<void> {
