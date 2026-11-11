@@ -1,0 +1,29 @@
+# Credenciales y configuraciones locales
+.env
+.env.*
+!.env.example
+
+# Dependencias y artefactos de aplicaciones
+**/node_modules/
+**/dist/
+**/.angular/
+coverage/
+npm-debug.log*
+
+# Ficheros intermedios de LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lol
+*.lot
+*.out
+*.synctex.gz
+*.toc
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

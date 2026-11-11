@@ -1,0 +1,110 @@
+<main class="shell">
+  <header class="topbar" aria-label="Cabecera de CiberGuía">
+    <a class="brand" href="#inicio" aria-label="CiberGuía, inicio">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none"><path d="M24 4 40 10v11c0 10.4-6.8 19-16 23-9.2-4-16-12.6-16-23V10L24 4Z" stroke="currentColor" stroke-width="3"/><path d="M16 24h16M24 16v16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      </span>
+      <span><strong>CiberGuía</strong><small>Asistente de ciberseguridad</small></span>
+    </a>
+    <div class="topbar-actions">
+      <span class="project-label">TFM · Prototipo evaluable</span>
+      <span class="status-pill" [class.live]="mode() === 'directline' || mode() === 'openai'" [class.loading]="mode() === 'loading'">
+        <i aria-hidden="true"></i>{{ statusText() }}
+      </span>
+    </div>
+  </header>
+
+  <section class="hero" id="inicio" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span></span>Decisiones con contexto, no con certezas fingidas</p>
+      <h1 id="hero-title">Orientación cibersegura,<br><em>trazable y humana.</em></h1>
+      <p class="hero-text">Un asistente conversacional para el análisis inicial de incidentes, sustentado en fuentes institucionales y diseñado para mostrar sus límites.</p>
+      <div class="hero-actions">
+        <button type="button" class="primary-action" (click)="scrollToSources()">Ver fuentes y alcance <span aria-hidden="true">↓</span></button>
+        <p><strong>Privacidad por diseño.</strong> No compartas contraseñas, tokens ni datos personales.</p>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="radar-grid"></div>
+      <div class="orb orb-main"><svg viewBox="0 0 48 48" fill="none"><path d="M24 4 40 10v11c0 10.4-6.8 19-16 23-9.2-4-16-12.6-16-23V10L24 4Z" stroke="currentColor" stroke-width="2.5"/><path d="m17 24 4.5 4.5L31 19" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="signal signal-one"></div><div class="signal signal-two"></div><div class="signal signal-three"></div>
+      <div class="visual-card source-card"><span>FUENTE</span><strong>INCIBE</strong><i>verificada</i></div>
+      <div class="visual-card score-card"><span>TRAZABILIDAD</span><strong>Alta</strong><div><b></b><b></b><b></b><b></b></div></div>
+    </div>
+  </section>
+
+  <section class="experience" aria-labelledby="assistant-title">
+    <aside class="context-panel">
+      <div>
+        <p class="eyebrow"><span></span>Contexto de la sesión</p>
+        <h2 id="assistant-title">Asistente de análisis</h2>
+      </div>
+      <dl class="session-facts">
+        <div><dt>Canal</dt><dd>{{ mode() === 'openai' ? 'OpenAI · Responses API' : mode() === 'directline' ? 'Copilot Studio · Direct Line' : 'Simulación local controlada' }}</dd></div>
+        <div><dt>Sesión</dt><dd>{{ mode() === 'openai' ? 'Clave protegida en el BFF' : mode() === 'directline' ? 'Token temporal en memoria' : 'Sin conexión a servicios externos' }}</dd></div>
+        <div><dt>Propósito</dt><dd>Orientación y evaluación, no ejecución automática</dd></div>
+      </dl>
+      <div class="guardrail">
+        <span class="guardrail-icon" aria-hidden="true">!</span>
+        <p><strong>Límite operativo</strong> Contrasta toda recomendación con el procedimiento de tu organización antes de actuar.</p>
+      </div>
+      <button type="button" class="text-button" (click)="retryConnection()" [disabled]="mode() === 'loading'">↻ Reintentar canal seguro</button>
+    </aside>
+
+    <div class="chat-card">
+      <header class="chat-header">
+        <div class="chat-title"><span class="assistant-avatar" aria-hidden="true">CG</span><div><strong>CiberGuía</strong><small>{{ mode() === 'openai' ? 'Canal OpenAI configurado' : mode() === 'directline' ? 'Asistente conectado' : 'Entorno de demostración' }}</small></div></div>
+        <span class="mode-chip" [class.online]="mode() === 'directline' || mode() === 'openai'">{{ mode() === 'openai' ? 'OPENAI' : mode() === 'directline' ? 'DIRECT LINE' : mode() === 'loading' ? 'CONECTANDO' : 'DEMO' }}</span>
+      </header>
+
+      <div class="connection-note" [class.is-demo]="mode() === 'demo' || mode() === 'loading'" aria-live="polite">
+        <span aria-hidden="true">{{ mode() === 'directline' || mode() === 'openai' ? '✓' : 'ⓘ' }}</span>
+        <p>{{ connectionDetail() || 'Estableciendo conexión protegida…' }}</p>
+      </div>
+
+      <div class="chat-area">
+        <div *ngIf="mode() === 'directline'; else textConversation" #webchatHost class="webchat-host" aria-label="Conversación con el asistente"></div>
+        <ng-template #textConversation>
+          <div class="demo-conversation" aria-live="polite">
+            <article *ngFor="let message of messages" class="message" [class.user-message]="message.author === 'user'">
+              <span class="message-avatar" aria-hidden="true">{{ message.author === 'assistant' ? 'CG' : 'TÚ' }}</span>
+              <div class="message-body">
+                <p>{{ message.text }}</p>
+                <div *ngIf="message.references?.length" class="references"><span>Referencias</span><a *ngFor="let reference of message.references" href="#fuentes">{{ reference }}</a></div>
+              </div>
+            </article>
+            <article *ngIf="isSending()" class="message">
+              <span class="message-avatar" aria-hidden="true">CG</span>
+              <div class="message-body"><p>Analizando la consulta…</p></div>
+            </article>
+          </div>
+          <div class="example-row" aria-label="Preguntas de ejemplo">
+            <button *ngFor="let example of examples" type="button" [disabled]="mode() === 'loading' || mode() === 'directline' || isSending()" (click)="useExample(example)">{{ example }}</button>
+          </div>
+          <form class="demo-composer" (ngSubmit)="sendMessage()">
+            <label for="demo-question" class="sr-only">Escribe una consulta para el asistente</label>
+            <input id="demo-question" [(ngModel)]="draft" name="question" maxlength="1200" autocomplete="off" placeholder="Describe un escenario de ciberseguridad…" [disabled]="mode() === 'loading' || mode() === 'directline' || isSending()">
+            <button type="submit" [disabled]="!draft.trim() || mode() === 'loading' || mode() === 'directline' || isSending()" aria-label="Enviar consulta">↑</button>
+          </form>
+        </ng-template>
+      </div>
+    </div>
+  </section>
+
+  <section class="method" id="fuentes" aria-labelledby="method-title">
+    <div class="method-heading"><p class="eyebrow"><span></span>Marco de confianza</p><h2 id="method-title">Cada respuesta debe poder <em>explicarse.</em></h2></div>
+    <div class="method-grid">
+      <article><span class="method-number">01</span><h3>Fuentes seleccionadas</h3><p>Conocimiento procedente de organismos y documentación técnica reconocidos, no de afirmaciones sin procedencia.</p></article>
+      <article><span class="method-number">02</span><h3>Separación de hechos</h3><p>El diseño distingue evidencia, hipótesis y recomendación para no convertir inferencias en certezas.</p></article>
+      <article><span class="method-number">03</span><h3>Escalado responsable</h3><p>Cuando el riesgo supera el ámbito del asistente, guía hacia el equipo y el procedimiento adecuados.</p></article>
+    </div>
+    <div class="source-links" aria-label="Fuentes de referencia">
+      <a href="https://www.incibe.es/" target="_blank" rel="noopener noreferrer"><span>INCIBE</span><small>Guías y avisos nacionales ↗</small></a>
+      <a href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener noreferrer"><span>NIST</span><small>Marco y respuesta a incidentes ↗</small></a>
+      <a href="https://www.enisa.europa.eu/" target="_blank" rel="noopener noreferrer"><span>ENISA</span><small>Agencia Europea de Ciberseguridad ↗</small></a>
+      <a href="https://learn.microsoft.com/security/" target="_blank" rel="noopener noreferrer"><span>Microsoft Learn</span><small>Seguridad de plataformas Microsoft ↗</small></a>
+    </div>
+  </section>
+
+  <footer><span>© 2026 · Prototipo académico de TFM</span><span>Diseñado para evaluación de precisión, trazabilidad y utilidad</span></footer>
+</main>

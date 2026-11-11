@@ -1,0 +1,288 @@
+% Capítulo 3: archivo incluido desde main.tex mediante \input{chapters/03_estado_arte}.
+\chapter{Estado del arte}
+\label{chap:estado-arte}
+
+Este capítulo revisa los conceptos y tecnologías que fundamentan el proyecto:
+agentes conversacionales con recuperación de conocimiento, plataformas de
+orquestación, integración web y gobierno de la IA generativa. El objetivo no es
+atribuir al artefacto capacidades que no hayan sido verificadas, sino justificar
+las decisiones de diseño y situar sus límites.
+
+\section{De los asistentes basados en reglas a los agentes fundamentados}
+\label{sec:evolucion-agentes}
+
+Los asistentes conversacionales clásicos suelen organizarse como árboles de
+diálogo o conjuntos de intenciones. Esta estrategia puede resultar predecible
+para procesos muy acotados, pero exige anticipar numerosas formulaciones y rutas
+de conversación. En una consulta de ciberseguridad, una misma intención puede
+expresarse de forma muy distinta: por ejemplo, un usuario puede preguntar por un
+correo sospechoso, un enlace que no reconoce o un posible robo de credenciales.
+El problema se agrava cuando la respuesta depende de una política que cambia, de
+un procedimiento interno o del contexto de un incidente.
+
+Los modelos de lenguaje permiten generar una respuesta a partir de lenguaje
+natural sin definir cada formulación de forma manual. Esta capacidad facilita el
+acceso a documentación heterogénea, pero no convierte al modelo en una fuente de
+verdad. Los modelos generativos pueden producir contenido erróneo presentado con
+confianza, un fenómeno denominado por NIST \emph{confabulación}
+\cite{nistGenAi2024}. Para un dominio como la ciberseguridad, la calidad no debe
+medirse sólo por la fluidez de la conversación: importa que los hechos estén
+fundamentados, que las recomendaciones sean prudentes y que la respuesta no
+amplíe una solicitud peligrosa.
+
+La generación aumentada por recuperación o RAG incorpora una fuente documental
+externa al proceso de generación. Lewis et al. describen arquitecturas que
+combinan memoria paramétrica y no paramétrica para tareas intensivas en
+conocimiento, con el objetivo de recuperar pasajes relevantes y condicionar la
+generación sobre ellos \cite{lewis2020rag}. En una solución empresarial, la idea
+central es usar documentos y repositorios controlados como contexto de respuesta,
+con la ventaja de poder actualizar el conocimiento sin reentrenar el modelo.
+
+No obstante, RAG no garantiza por sí solo veracidad, actualidad o seguridad. La
+recuperación puede seleccionar material irrelevante; el material puede estar
+desactualizado, ser ambiguo o contener instrucciones maliciosas; y el modelo
+puede resumirlo incorrectamente. Por ello, el presente trabajo trata el
+conocimiento como un activo gobernado: se selecciona, se versiona, se limita por
+alcance y se valida mediante preguntas cuya respuesta pueda contrastarse con una
+fuente aprobada.
+
+\section{Conocimiento de ciberseguridad para el caso de uso}
+\label{sec:conocimiento-ciberseguridad}
+
+El agente no necesita reproducir un marco completo de gestión de seguridad, pero
+sí debe encajar en él. CSF 2.0 ofrece un vocabulario útil para relacionar las
+consultas de personas usuarias con actividades de gobierno, protección,
+detección, respuesta y recuperación \cite{nistCsf2024}. Por ejemplo, una duda
+sobre autenticación multifactor se conecta principalmente con la protección; una
+notificación de correo malicioso debe llevar hacia detección y respuesta; y una
+pregunta sobre responsables o procedimiento remite a gobierno.
+
+El contenido de respuesta ante incidentes requiere un tratamiento especialmente
+cuidadoso. NIST recomienda incorporar la respuesta a incidentes en las
+actividades de gestión del riesgo durante todo el ciclo de vida
+\cite{nistIncident2025}. La guía de INCIBE sobre respuesta a incidentes subraya
+la necesidad de responsables, procedimientos de notificación, registro de
+evidencias y revisión del plan \cite{incibeCrisis}. De estos documentos se
+extrae una decisión de diseño: el agente puede explicar pasos iniciales de
+seguridad y el mecanismo de escalado, pero no debe simular una investigación,
+ordenar acciones irreversibles ni sustituir a la cadena de decisión humana.
+
+Los recursos públicos también ayudan a fijar un lenguaje accesible. INCIBE
+describe el phishing como una suplantación destinada a obtener información,
+causar un perjuicio económico o infectar el dispositivo \cite{incibePhishing}.
+Esta definición sirve como punto de partida para preguntas frecuentes, pero la
+respuesta del agente debe centrarse en la conducta segura: no abrir enlaces o
+adjuntos sospechosos, usar el canal de reporte configurado y no aportar
+credenciales ni datos personales en el chat.
+
+La actualidad es otro requisito. El informe ENISA Threat Landscape 2025 analiza
+incidentes y tendencias dentro de un periodo concreto y evidencia que la
+prioridad de amenazas depende del contexto temporal y sectorial
+\cite{enisaThreat2025}. Por tanto, no se deberá presentar una fuente de panorama
+de amenazas como una descripción permanente ni inferir que sus estadísticas se
+aplican a una organización ficticia. Su función en el TFM es justificar el
+contexto y orientar la selección de casos, no alimentar afirmaciones específicas
+que no estén respaldadas.
+
+\section{Microsoft Copilot Studio como plataforma de agente}
+\label{sec:copilot-studio}
+
+Microsoft Copilot Studio es una plataforma para crear, configurar, probar y
+publicar agentes con fuentes de conocimiento, temas, herramientas y canales. La
+documentación de producto describe que el conocimiento puede añadirse a nivel de
+agente o de tema y que admite, según el entorno y la licencia, sitios públicos,
+documentos, SharePoint, Dataverse, Azure AI Search y otros orígenes
+\cite{copilotKnowledge}. Esta diversidad es útil, pero aumenta la importancia de
+aplicar el principio de mínimo conocimiento: se incorporará únicamente el
+material necesario para las categorías de consulta aprobadas.
+
+La orquestación generativa introduce una capa de planificación basada en modelos
+de lenguaje que interpreta la intención y puede seleccionar conocimientos,
+herramientas o temas para construir una respuesta \cite{copilotOrchestration}.
+Frente a un árbol de diálogo totalmente manual, esa aproximación reduce parte de
+la rigidez conversacional; a cambio, el comportamiento depende de las
+instrucciones, descripciones y recursos disponibles. La plataforma recomienda
+que las instrucciones se apoyen en recursos configurados, empleen nombres
+exactos cuando se refieran a herramientas y se prueben tras cada cambio
+\cite{copilotInstructions}.
+
+Para este TFM, las instrucciones se utilizarán como una capa de orientación, no
+como un control de seguridad único. Deben establecer el dominio permitido, el
+formato de respuesta, la obligación de indicar límites y las condiciones de
+derivación. Las decisiones críticas ---como bloquear la publicación no
+autenticada, filtrar endpoints o restringir conectores--- requieren además
+configuración de plataforma, control de acceso y revisión humana.
+
+Las fuentes públicas merecen una precaución adicional. La documentación de
+Microsoft indica que la recuperación sobre sitios públicos depende de contenido
+indexado y posee límites de profundidad y de cobertura \cite{copilotPublicWeb}.
+En consecuencia, una URL añadida como fuente no equivale a haber validado que
+todas sus páginas relevantes serán recuperadas. El inventario de conocimiento
+debe acompañarse de pruebas de recuperación para las preguntas que se pretenda
+soportar.
+
+\section{Evaluación de agentes conversacionales}
+\label{sec:evaluacion-agentes}
+
+La evaluación de un agente puede abarcar respuesta única, conversaciones de
+varios turnos, recuperación de conocimiento, llamadas a herramientas, seguridad
+y experiencia de usuario. Copilot Studio permite organizar casos en conjuntos de
+prueba y comparar la salida con respuestas esperadas o métodos de calidad
+\cite{copilotEvaluation}. Esta capacidad facilita la regresión: un mismo conjunto
+puede ejecutarse después de modificar una fuente, una instrucción o una
+integración.
+
+Sin embargo, una evaluación automática debe interpretarse con cautela. Una
+coincidencia textual puede penalizar una respuesta correcta formulada de otra
+manera; una medida semántica puede aceptar una respuesta que omite una acción
+esencial; y una puntuación de calidad no demuestra que la fuente recuperada sea
+la adecuada. Por ello, el protocolo del Capítulo~\ref{chap:objetivos-metodologia}
+combina criterios automáticos, cuando estén disponibles, y revisión humana con
+una rúbrica. También reserva casos específicos para abstención segura,
+derivación y resistencia frente a entradas adversariales.
+
+La trazabilidad aporta un criterio adicional. Una respuesta no debe citar una
+fuente inexistente, una URL no relacionada o una política ficticia como si fuera
+real. Cuando el canal permita mostrar referencias, se comprobará que la
+referencia corresponda al contenido utilizado. Cuando no las muestre, la
+trazabilidad deberá aportarse mediante registros de prueba y un mapeo manual
+entre respuesta esperada y fuente de conocimiento.
+
+\section{Integración web y seguridad de canal}
+\label{sec:integracion-web}
+
+Una aplicación Angular permite controlar el contexto visual, los avisos al
+usuario, los enlaces a procedimientos y la experiencia de consulta. Angular
+recomienda mantener las dependencias actualizadas, evitar APIs identificadas como
+riesgo de seguridad y reducir el riesgo de XSS mediante plantillas, sanitización,
+Content Security Policy y Trusted Types cuando resulte aplicable
+\cite{angularSecurity}. No obstante, la protección frente a XSS no resuelve por
+sí sola los problemas propios de una aplicación de chat: gestión de sesión,
+autorización, protección de tokens, controles de origen, registros y límites de
+uso deben diseñarse de forma conjunta.
+
+Copilot Studio puede publicar agentes en diversos canales. Microsoft recomienda
+aplicar autenticación y controles de gobierno, especialmente cuando el agente se
+utiliza dentro de una organización o por un grupo específico de usuarios
+\cite{copilotPublish}. Para una aplicación web personalizada, el diseño deberá
+declarar la opción de autenticación seleccionada y justificarla. Una integración
+sin autenticación puede ser apropiada para una demostración sin conocimiento
+interno, pero no constituye el diseño por defecto de un despliegue organizativo.
+
+La documentación de seguridad del canal web indica que Copilot Studio utiliza el
+canal Direct Line de Bot Framework para conectar la página o aplicación con el
+agente. Si se habilita el acceso protegido, el cliente debe usar secretos o
+tokens; en código que se ejecuta en el navegador, el secreto debe intercambiarse
+por un token desde un servicio y no exponerse en el cliente
+\cite{copilotWebSecurity}. Esta propiedad condiciona la arquitectura: un secreto
+de Direct Line no se incluirá en variables públicas de Angular ni en un
+repositorio.
+
+Microsoft también documenta opciones de integración mediante SDK y Direct Line,
+incluido un patrón basado en eventos para enviar contexto inicial de forma fiable
+\cite{copilotDirectLine}. Dicho contexto deberá limitarse a datos no sensibles y
+estar sujeto a validación. Si se habilita inicio de sesión único, Copilot Studio
+requiere una configuración de autenticación con Microsoft Entra ID, registros de
+aplicación diferenciados y un flujo de intercambio de tokens
+\cite{copilotSso}. Esta configuración se tratará como una mejora opcional
+condicionada a los requisitos y recursos del entorno, no como una funcionalidad
+que pueda declararse implantada sin evidencia.
+
+La viabilidad operativa también depende de licencias y capacidad. Microsoft
+distingue licencias de usuario para crear y gestionar agentes de la licencia de
+tenant, y recomienda estimar el consumo antes de un despliegue
+\cite{copilotLicensing}. En este trabajo, los aspectos de licencia se documentan
+como una restricción de entorno. No se infieren costes ni derechos de uso que no
+puedan verificarse en el tenant concreto.
+
+\section{Riesgos de seguridad específicos de la IA generativa}
+\label{sec:riesgos-ia-generativa}
+
+El modelo de amenazas debe considerar tanto vulnerabilidades tradicionales de la
+aplicación como riesgos propios del agente. El AI RMF de NIST organiza la gestión
+de riesgos de IA alrededor de las funciones de gobernar, mapear, medir y
+gestionar \cite{nistAiRmf2023}. Su perfil para IA generativa señala riesgos
+relacionados con la confabulación, privacidad, seguridad de la información,
+integración de componentes y configuración humano--IA \cite{nistGenAi2024}.
+
+OWASP incluye entre los riesgos de aplicaciones con LLM la inyección de prompts,
+la divulgación de información sensible, los riesgos de cadena de suministro, el
+envenenamiento de datos y la agencia excesiva \cite{owaspLlm2026}. Estos riesgos
+se traducen en controles concretos para el proyecto:
+
+\begin{itemize}
+  \item no incorporar a la base de conocimiento texto no revisado ni permitir que
+  una instrucción incluida en un documento redefina el comportamiento del agente;
+  \item no almacenar secretos, tokens, credenciales o evidencias reales en
+  fuentes de conocimiento ni en las conversaciones de prueba;
+  \item limitar las acciones del agente a orientación informativa; no se
+  habilitarán herramientas con capacidad de modificar sistemas;
+  \item validar que las salidas presentadas por la interfaz no se interpreten como
+  HTML confiable ni como instrucciones ejecutables;
+  \item incorporar avisos visibles sobre el alcance, la posible incertidumbre y
+  la necesidad de recurrir a canales humanos ante incidentes; y
+  \item probar explícitamente intentos de revelar instrucciones, alterar el
+  contexto o conseguir información de otros usuarios.
+\end{itemize}
+
+La defensa no debe descansar sobre una única instrucción de rechazo. La reducción
+de superficie se consigue combinando alcance limitado, conocimiento aprobado,
+autenticación adecuada, seguridad de canal, mínimo privilegio, revisión de
+configuración y pruebas de robustez. Las limitaciones que sobrevivan a estos
+controles deben aparecer en la memoria y en la interfaz, en lugar de ocultarse
+detrás de un lenguaje excesivamente seguro.
+
+\section{Privacidad, regulación y supervisión humana}
+\label{sec:privacidad-regulacion}
+
+Un agente conversacional puede recibir datos personales o información sensible
+aunque no se haya diseñado para ello. El RGPD exige que el responsable aplique
+medidas técnicas y organizativas apropiadas al riesgo y pueda demostrar el
+cumplimiento \cite{gdpr}. Para el TFM, el control más directo es no utilizar
+información real en pruebas y minimizar los datos que el usuario puede aportar.
+En un uso futuro, habría que analizar la base jurídica, información al usuario,
+retención, transferencias, subencargados, derechos de los interesados y gestión
+de brechas.
+
+El Reglamento (UE) 2024/1689 establece reglas armonizadas sobre sistemas de IA y
+persigue promover una IA centrada en las personas y fiable, protegiendo a la vez
+salud, seguridad y derechos fundamentales \cite{aiAct}. La clasificación y las
+obligaciones concretas dependen del caso de uso, rol y fecha de aplicación; no se
+deduce automáticamente que este prototipo cumpla o incumpla una categoría
+regulatoria. Sus principios sí informan la solución: transparencia acerca de la
+interacción con un agente, supervisión humana, documentación y tratamiento
+proporcional del riesgo.
+
+\section{Síntesis y contribución propuesta}
+\label{sec:sintesis-estado-arte}
+
+La Tabla~\ref{tab:comparacion-enfoques} resume el espacio de diseño. No pretende
+medir el rendimiento de una implementación concreta; identifica qué propiedad
+aporta cada enfoque y qué limitación debe compensarse.
+
+\begin{table}[H]
+\centering
+\caption{Comparación conceptual de enfoques de asistencia conversacional.}
+\label{tab:comparacion-enfoques}
+\begin{tabular}{p{0.24\textwidth}p{0.31\textwidth}p{0.34\textwidth}}
+\hline
+\textbf{Enfoque} & \textbf{Ventaja principal} & \textbf{Limitación relevante}\\
+\hline
+FAQ o árbol de diálogo & Comportamiento predecible para rutas predefinidas. &
+Escasa flexibilidad ante paráfrasis y mantenimiento costoso de rutas.\\
+Modelo generativo sin conocimiento controlado & Interacción flexible y lenguaje
+natural. & Riesgo elevado de información no verificable o desactualizada.\\
+Agente generativo con recuperación y gobierno & Puede unir consultas variadas con
+fuentes seleccionadas y trazabilidad. & Depende de la calidad de la recuperación,
+de las instrucciones y de controles adicionales.\\
+\hline
+\end{tabular}
+\end{table}
+
+La contribución propuesta del TFM es un artefacto de alcance restringido que
+combina una base de conocimiento curada, reglas explícitas de seguridad,
+integración Angular y una batería de evaluación orientada a evidencia. Su valor
+no reside en afirmar que un agente sustituye a especialistas, sino en mostrar
+cómo puede diseñarse un primer nivel de apoyo que mantenga la trazabilidad,
+reconozca sus límites y pueda evolucionar mediante pruebas reproducibles.
+

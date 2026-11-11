@@ -1,0 +1,32 @@
+\chapter{Discusi\'on}
+\label{chap:discusion}
+
+El valor de este trabajo reside en convertir una idea de ``asistente de dudas'' en un artefacto delimitado, trazable y evaluable. La discusi\'on no debe confundir la existencia de una interfaz funcional con la validaci\'on de las hip\'otesis. La arquitectura, el paquete de conocimiento y la matriz de pruebas aportan evidencia de dise\~no; las hip\'otesis H1--H4 requieren ejecutar la evaluaci\'on en Copilot Studio y revisar resultados reales.
+
+\section{Interpretaci\'on de las aportaciones}
+
+La primera aportaci\'on es la separaci\'on entre conocimiento aprobado, comportamiento conversacional y canal de presentaci\'on. En muchos prototipos estos elementos quedan mezclados en una instrucci\'on extensa o en un iframe sin control. El resultado es dif\'icil de auditar y actualizar. En cambio, el inventario de fuentes permite retirar un documento, modificar su revisi\'on o justificar una respuesta sin cambiar el cliente web. El paquete de temas permite inspeccionar de forma independiente las conductas de escalado y rechazo.
+
+La segunda aportaci\'on es el BFF para la integraci\'on web. Aunque un widget embebido puede acelerar una demostraci\'on, no resuelve por s\'i solo el riesgo de exponer credenciales de canal ni el de confundir una p\'agina p\'ublica con un entorno corporativo autenticado. El dise\~no de token ef\'imero, la configuraci\'on por variables de entorno y los controles de tasa no garantizan seguridad absoluta, pero aplican el principio de m\'inimo privilegio a una frontera concreta.
+
+La tercera aportaci\'on es metodol\'ogica. Definir afirmaciones de oro, abstenci\'on esperada y ataques adversarios antes de medir evita que la evaluaci\'on se limite a ejemplos favorables. La literatura de RAG muestra que la recuperaci\'on y la generaci\'on deben evaluarse por separado, y que una respuesta plausible no basta para establecer correcci\'on \cite{lewis2020rag,ragas2024}. La combinaci\'on de m\'etricas y r\'ubrica humana da una base m\'as defendible que una valoraci\'on subjetiva de unas pocas conversaciones.
+
+\section{L\'imites t\'ecnicos y organizativos}
+
+Copilot Studio es una plataforma administrada: su comportamiento puede variar con el modelo, la regi\'on, la licencia, las pol\'iticas DLP, la configuraci\'on de autenticaci\'on y los cambios de producto. El equipo del TFM no controla el modelo subyacente ni demuestra formalmente las propiedades de seguridad. El conocimiento web tambi\'en cambia; por ello se propone un corpus cerrado durante la evaluaci\'on y una revisi\'on programada para la operaci\'on.
+
+El modo demostraci\'on incluido en la aplicaci\'on tiene un l\'imite expl\'icito: permite verificar la experiencia de usuario y las protecciones de integraci\'on sin credenciales, pero no representa la calidad de un agente desplegado. Sustituirlo por resultados ficticios vulnerar\'ia la trazabilidad que el propio trabajo pretende defender. La activaci\'on real exige una cuenta autorizada, un entorno de Power Platform y aprobaci\'on del propietario de las fuentes.
+
+La elecci\'on de no dar acciones al agente reduce el riesgo de \emph{excessive agency}, pero tambi\'en reduce su automatizaci\'on. Es una concesi\'on intencionada en un contexto de primera versi\'on: antes de conectar sistemas de tickets, correo o inventario se necesitan autenticaci\'on, autorizaci\'on granular, validaci\'on de entradas, aprobaci\'on humana y pruebas espec\'ificas. El perfil de NIST para IA generativa y el trabajo de OWASP recomiendan tratar estos riesgos como parte del ciclo de vida, no como una advertencia a\~nadida al final \cite{nistGenAi2024,owaspLlm2026}.
+
+\section{Implicaciones para el despliegue responsable}
+
+Un posible despliegue organizativo debe comenzar con un piloto de usuarios voluntarios y un corpus peque\~no, no con toda la documentaci\'on corporativa. Las conversaciones deben someterse a una pol\'itica de retenci\'on, y los usuarios tienen que saber qu\'e datos se procesan y con qu\'e fin. El responsable de seguridad debe mantener un cat\'alogo de respuestas de escalado para incidentes reales. Las pruebas de regresi\'on se ejecutan tras cada cambio de instrucciones, fuente o modelo, y cualquier fallo cr\'itico bloquea la promoci\'on.
+
+La transparencia no consiste solo en una frase legal. En este caso significa mostrar que el sistema es IA, explicar que las respuestas se basan en conocimiento seleccionado, exponer sus limitaciones y facilitar una alternativa humana. Esta aproximaci\'on es compatible con el RGPD y con los requisitos de transparencia de la regulaci\'on europea de IA \cite{gdpr,aiAct}.
+
+\section{Respuesta a las hip\'otesis}
+
+Con la evidencia local se puede sostener que la soluci\'on implementa controles de separaci\'on de secretos, delimitaci\'on funcional, configuraci\'on versionable y un protocolo de prueba. No se puede aceptar ni rechazar H1, H2, H3 o H4 hasta ejecutar el conjunto congelado contra las configuraciones C0--C2 y revisar las salidas. Esta conclusi\'on negativa es deliberada: evita presentar resultados esperados como observaciones emp\'iricas.
+
+Cuando se disponga de acceso al tenant, el estudio debe actualizar esta secci\'on con: las m\'etricas por configuraci\'on, intervalos de confianza si el tama\~no muestral lo permite, la distribuci\'on de fallos por categor\'ia, ejemplos anonimizados y el resultado del acuerdo entre revisores. Si las metas no se cumplen, la discusi\'on debe describir la causa probable --recuperaci\'on irrelevante, ausencia de fuente, instrucci\'on ambigua o l\'imite del modelo-- y la iteraci\'on aplicada.

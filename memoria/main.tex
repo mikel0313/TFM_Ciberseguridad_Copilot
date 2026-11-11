@@ -1,0 +1,144 @@
+\documentclass[12pt,twoside,titlepage]{book}
+
+% -----------------------------------------------------------------------------
+% Memoria TFM -- fuente principal
+% Sustituir los campos marcados como pendientes antes de una entrega oficial.
+% -----------------------------------------------------------------------------
+\usepackage[a4paper,inner=32mm,outer=25mm,top=28mm,bottom=30mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+% Evita que babel espa\~nol interprete el car\'acter > dentro de estilos TikZ.
+\shorthandoff{>}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\autor}{Mikel \'Alvarez Barroso}
+\newcommand{\numeroexpediente}{\textit{Pendiente de confirmar}}
+\newcommand{\tutor}{Juan Jos\'e S\'anchez Pe\~na \textit{(propuesto)}}
+\newcommand{\titulo}{Desarrollo de un agente en Microsoft Copilot Studio para resolver dudas sobre ciberseguridad}
+\newcommand{\fechaentrega}{Octubre de 2026 -- borrador de trabajo}
+
+\definecolor{uaxblue}{RGB}{15,68,130}
+\definecolor{codebg}{RGB}{246,248,250}
+\hypersetup{
+  pdftitle={\titulo},
+  pdfauthor={\autor},
+  colorlinks=true,
+  linkcolor=uaxblue,
+  citecolor=uaxblue,
+  urlcolor=uaxblue
+}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{black!20},
+  breaklines=true,
+  columns=fullflexible,
+  showstringspaces=false
+}
+\setlist[itemize]{topsep=4pt,itemsep=2pt}
+\setlist[enumerate]{topsep=4pt,itemsep=2pt}
+\setlength{\parskip}{0.55em}
+\setlength{\parindent}{0pt}
+\renewcommand{\arraystretch}{1.18}
+\setcounter{tocdepth}{2}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\nouppercase{\leftmark}}
+\fancyhead[RO]{\nouppercase{\rightmark}}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{16pt}
+
+\begin{document}
+\selectlanguage{spanish}
+
+\begin{titlepage}
+\begin{center}
+{\Large Universidad Alfonso X El Sabio\par}
+\vspace{0.4cm}
+{\Large Facultad de Business \& Tech\par}
+\vspace{0.7cm}
+{\large \textbf{M\'aster Universitario en Ciberseguridad}\par}
+\vspace{2.3cm}
+{\Large \textbf{Trabajo Fin de M\'aster}\par}
+\vspace{1.6cm}
+{\LARGE \textbf{\titulo}\par}
+\vfill
+\begin{tabular}{rl}
+\textbf{Autor:} & \autor \\
+\textbf{N.P.:} & \numeroexpediente \\
+\textbf{Tutor:} & \tutor \\
+\textbf{Fecha:} & \fechaentrega \\
+\end{tabular}
+\vspace{1.2cm}
+\end{center}
+\end{titlepage}
+
+\frontmatter
+\chapter*{Resumen}
+\addcontentsline{toc}{chapter}{Resumen}
+Las organizaciones y los usuarios reciben con frecuencia consultas sobre phishing, contrase\~nas, autenticaci\'on multifactor, actualizaciones, dispositivos e incidentes. La informaci\'on disponible es abundante, heterog\'enea y cambiante; a la vez, un sistema generativo puede producir respuestas plausibles pero incorrectas, utilizar conocimiento no verificable o ser objeto de instrucciones maliciosas. Este trabajo dise\~na e implementa un prototipo de agente conversacional de ciberseguridad orientado a consulta y concienciaci\'on, basado en Microsoft Copilot Studio e integrado en una aplicaci\'on web Angular.
+
+La propuesta trata el agente como un artefacto trazable de solo lectura. Su base de conocimiento se gobierna mediante un inventario versionado de fuentes institucionales --INCIBE, ENISA, NIST y Microsoft Learn-- y su comportamiento incorpora citaci\'on, abstenci\'on, derivaci\'on humana y l\'imites de seguridad. La interfaz no expone el secreto del canal: un servicio backend emite tokens Direct Line ef\'imeros para la conversaci\'on. Tambi\'en se incluye un modo de demostraci\'on claramente identificado para comprobar la experiencia de usuario sin confundirlo con el agente real.
+
+Se define una evaluaci\'on reproducible que combina casos sint\'eticos trazables, r\'ubrica humana, m\'etricas de exactitud, fundamentaci\'on, calidad de citas, abstenci\'on y resistencia a entradas adversarias. La entrega no inventa resultados de Copilot Studio: su ejecuci\'on requiere un tenant con licencia y aprobaci\'on de fuentes. En su lugar, aporta el c\'odigo, la configuraci\'on documental, el protocolo y la evidencia local necesarios para realizar una validaci\'on honesta antes de un despliegue organizativo.
+
+\vspace{0.4cm}
+\noindent\textbf{Palabras clave:} ciberseguridad, agente conversacional, recuperaci\'on aumentada, Copilot Studio, Angular, trazabilidad, evaluaci\'on de IA.
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Organizations and end users regularly ask questions about phishing, passwords, multi-factor authentication, updates, devices, and incident reporting. Available security information is abundant, heterogeneous, and constantly changing, while generative systems can produce convincing but incorrect answers or be manipulated through malicious instructions. This work designs and implements a cybersecurity conversational-agent prototype for consultation and awareness, based on Microsoft Copilot Studio and integrated into an Angular web application.
+
+The proposal treats the agent as a traceable, read-only artifact. Its knowledge base is governed through a versioned inventory of institutional sources --INCIBE, ENISA, NIST, and Microsoft Learn-- while its behavior incorporates citation, abstention, human escalation, and safety boundaries. The web client never exposes the channel secret: a backend service issues short-lived Direct Line conversation tokens. A clearly labelled demonstration mode is also included to test the user experience without presenting it as the live agent.
+
+The work defines a reproducible evaluation protocol combining traceable synthetic cases, a human rubric, and metrics for factual accuracy, groundedness, citation quality, abstention, and resistance to adversarial inputs. It does not fabricate Copilot Studio results: running the live evaluation requires a licensed tenant and approved sources. Instead, the deliverable provides the code, documented configuration, test protocol, and local evidence needed to conduct an honest validation before organizational deployment.
+
+\vspace{0.4cm}
+\noindent\textbf{Keywords:} cybersecurity, conversational agent, retrieval-augmented generation, Copilot Studio, Angular, traceability, AI evaluation.
+
+\tableofcontents
+\listoftables
+\listoffigures
+\lstlistoflistings
+
+\mainmatter
+\input{chapters/01_introduccion}
+\input{chapters/02_objetivos_metodologia}
+\input{chapters/03_estado_arte}
+\input{chapters/04_analisis_y_diseno}
+\input{chapters/05_implementacion}
+\input{chapters/06_validacion}
+\input{chapters/07_discusion}
+\input{chapters/08_conclusiones}
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Bibliograf\'ia}
+\bibliographystyle{apalike}
+\bibliography{bibliografia}
+
+\appendix
+\input{appendices/A_instrucciones_agente}
+\input{appendices/B_protocolo_evaluacion}
+\input{appendices/C_reproducibilidad}
+
+\end{document}

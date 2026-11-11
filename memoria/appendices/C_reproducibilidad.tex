@@ -1,0 +1,14 @@
+\chapter{Reproducibilidad y ejecuci\'on}
+\label{apx:reproducibilidad}
+
+La entrega incluye las instrucciones de instalaci\'on, variables de entorno de ejemplo, comprobaciones y gu\'ia de configuraci\'on en el archivo \texttt{README.md} de la ra\'iz. Para reproducir el agente se necesita un entorno de Copilot Studio con licencia; este requisito no se sustituye por el modo demostraci\'on local. Antes de publicar, el responsable debe:
+
+\begin{enumerate}
+  \item aprobar el inventario de fuentes y revisar sus fechas de vigencia;
+  \item crear el agente y temas siguiendo la gu\'ia del paquete;
+  \item configurar el canal con acceso protegido y guardar el secreto solo en el BFF;
+  \item ejecutar la suite local y el conjunto de evaluaci\'on del agente;
+  \item exportar resultados, revisar fallos cr\'iticos y publicar la versi\'on aprobada.
+\end{enumerate}
+
+La ausencia de un secreto o de una licencia nunca se resuelve insertando valores ficticios en el c\'odigo fuente. El modo demostraci\'on existe para revisar la interfaz y los l\'imites antes de que el propietario habilite el canal real.

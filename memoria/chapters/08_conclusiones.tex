@@ -1,0 +1,20 @@
+\chapter{Conclusiones y trabajo futuro}
+\label{chap:conclusiones}
+
+Este Trabajo Fin de M\'aster ha dise\~nado e implementado una base reproducible para un agente conversacional de ciberseguridad integrado en una aplicaci\'on Angular. La propuesta se ha tratado como un problema de ingenier\'ia y de gesti\'on de riesgos, no solo como una integraci\'on de un modelo de lenguaje. El resultado combina: un alcance limitado a consulta y concienciaci\'on; un corpus institucional gobernado; instrucciones de comportamiento seguro; temas de derivaci\'on deterministas; una integraci\'on web que no expone el secreto de canal; y una matriz de evaluaci\'on que evita inventar resultados.
+
+Se han materializado los siguientes objetivos:
+
+\begin{itemize}
+  \item Se han definido casos de uso, requisitos y exclusiones para consultas de phishing, credenciales, MFA, incidentes, actualizaciones y buenas pr\'acticas.
+  \item Se ha dise\~nado un proceso de aprobaci\'on y revisi\'on de conocimiento basado en INCIBE, ENISA, NIST y Microsoft Learn.
+  \item Se ha preparado una configuraci\'on de Copilot Studio con instrucciones, temas y controles de seguridad que puede reproducirse en un tenant autorizado.
+  \item Se ha implementado una aplicaci\'on Angular y un BFF que preservan el secreto Direct Line y distinguen un modo demostraci\'on de una conexi\'on real.
+  \item Se ha creado una estrategia de validaci\'on con casos sint\'eticos, r\'ubrica, m\'etricas de grounding, abstenci\'on y resistencia adversaria.
+\end{itemize}
+
+La aportaci\'on principal no es afirmar que un chatbot sea infalible, sino establecer las condiciones bajo las cuales su uso puede evaluarse con honestidad. Un corpus curado, una cita visible y una instrucci\'on de abstenci\'on reducen riesgos, pero no constituyen una garant\'ia de correcci\'on. La seguridad final depende tambi\'en de la configuraci\'on del tenant, la revisi\'on humana, las pol\'iticas de datos, la actualizaci\'on del corpus y la respuesta de los usuarios ante una advertencia.
+
+La limitaci\'on pendiente es la ejecuci\'on de la evaluaci\'on contra un agente real de Copilot Studio. Esa fase necesita acceso con licencia, aprobaci\'on de fuentes y publicaci\'on en un entorno de pruebas. El repositorio entrega todos los elementos preparatorios y una gu\'ia para completarla, pero no atribuye al prototipo resultados emp\'iricos que no se han observado. Esta limitaci\'on debe resolverse antes de presentar la memoria como evaluaci\'on completa del agente en producci\'on.
+
+Como trabajo futuro se proponen seis l\'ineas: (i) realizar el experimento C0--C2 con revisores independientes; (ii) a\~nadir autenticaci\'on corporativa mediante Entra ID y autorizaci\'on por rol; (iii) incorporar una b\'usqueda h\'ibrida y un cat\'alogo de metadatos para documentos internos; (iv) automatizar la regresi\'on, el red teaming y el control de versiones de fuentes; (v) medir usabilidad con participantes informados; y (vi) definir gobierno operativo, retenci\'on de datos y proceso de gesti\'on de incidentes del propio agente. Estas l\'ineas permitir\'ian evolucionar el prototipo sin sacrificar trazabilidad ni control humano.

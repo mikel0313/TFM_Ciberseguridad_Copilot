@@ -1,0 +1,349 @@
+% Capítulo 2: archivo incluido desde main.tex mediante \input{chapters/02_objetivos_metodologia}.
+\chapter{Objetivos y metodología}
+\label{chap:objetivos-metodologia}
+
+Este capítulo concreta qué se pretende construir, cómo se comprobará su
+funcionamiento y qué evidencia será necesaria para sostener las conclusiones. La
+evaluación no se plantea como una actividad posterior al desarrollo: las
+condiciones de aceptación y los casos de prueba se definen antes de publicar una
+versión del agente. De este modo, el TFM podrá distinguir entre una capacidad
+implementada, una capacidad demostrada y una mejora pendiente.
+
+\section{Objetivo principal}
+\label{sec:objetivo-principal}
+
+Diseñar, implementar y evaluar un agente conversacional de ciberseguridad en
+Microsoft Copilot Studio, integrado en una interfaz web desarrollada con Angular,
+que responda a consultas frecuentes de carácter defensivo de forma comprensible,
+fundamentada en fuentes reconocidas y coherente con un conjunto explícito de
+límites de seguridad.
+
+El término \emph{evaluar} se emplea aquí en sentido estricto: se recogerán
+evidencias a partir de una batería de consultas sintéticas, criterios de
+aceptación predefinidos y revisión humana. No se considerará cumplido el objetivo
+por el mero hecho de que el agente produzca respuestas plausibles en una
+demostración aislada.
+
+\section{Objetivos específicos}
+\label{sec:objetivos-especificos}
+
+Para alcanzar el objetivo principal se establecen los siguientes objetivos
+específicos:
+
+\begin{enumerate}
+  \item Delimitar los casos de uso, actores, información permitida y situaciones
+  que deben derivarse a personal especializado.
+  \item Seleccionar, clasificar y documentar fuentes de conocimiento fiables de
+  organismos públicos, estándares y documentación oficial de producto.
+  \item Configurar el agente en Microsoft Copilot Studio con instrucciones de
+  comportamiento, conocimiento acotado y respuestas de rechazo o escalado para
+  solicitudes fuera de alcance.
+  \item Diseñar e implementar una aplicación Angular que ofrezca una experiencia
+  de consulta accesible y que integre el canal publicado sin exponer secretos ni
+  debilitar los controles de autenticación.
+  \item Aplicar controles básicos de seguridad a la solución, incluidos la
+  minimización de datos, la gestión de configuración, la protección de la
+  integración web y la trazabilidad de las fuentes.
+  \item Diseñar una batería de pruebas repetible que cubra consultas normales,
+  parafraseadas, ambiguas, fuera de alcance y adversariales.
+  \item Analizar los resultados obtenidos, los fallos detectados y las amenazas a
+  la validez de la evaluación, sin extrapolarlos a un despliegue real no
+  realizado.
+\end{enumerate}
+
+\section{Requisitos del sistema}
+\label{sec:requisitos}
+
+Los requisitos se redactan de forma verificable para que puedan relacionarse con
+los casos de prueba y con la evidencia de implementación. La
+Tabla~\ref{tab:requisitos-funcionales} resume los requisitos funcionales
+iniciales; el detalle de su implementación deberá incorporarse al capítulo
+técnico junto con la referencia a la versión del artefacto evaluada.
+
+\begin{table}[H]
+\centering
+\caption{Requisitos funcionales iniciales.}
+\label{tab:requisitos-funcionales}
+\begin{tabular}{@{}p{0.14\textwidth}p{0.61\textwidth}p{0.17\textwidth}@{}}
+\hline
+\textbf{ID} & \textbf{Requisito} & \textbf{Verificación prevista}\\
+\hline
+RF-01 & El agente debe responder consultas defensivas sobre phishing,
+credenciales, dispositivos, buenas prácticas, incidentes y políticas simuladas.
+& Casos por categoría.\\
+RF-02 & La respuesta debe priorizar el conocimiento aprobado y, cuando la
+capacidad del canal lo permita, mostrar o identificar la fuente utilizada. &
+Revisión de trazabilidad.\\
+RF-03 & Ante una posible incidencia, el agente debe recomendar el canal de
+notificación configurado y no afirmar que ha investigado o contenido el hecho.
+& Casos de derivación.\\
+RF-04 & El agente debe rechazar o reconducir solicitudes ofensivas, solicitudes
+de secretos y consultas ajenas a su dominio. & Casos de límites y abuso.\\
+RF-05 & La interfaz Angular debe permitir iniciar una conversación, mostrar
+mensajes y presentar los avisos de alcance y privacidad definidos. & Prueba
+manual de interfaz.\\
+RF-06 & La integración con el canal debe emplear el mecanismo de publicación y
+seguridad elegido, sin incluir secretos reutilizables en código distribuido al
+navegador. & Revisión de configuración.\\
+\hline
+\end{tabular}
+\end{table}
+
+Los requisitos no funcionales se agrupan en cinco propiedades. Primero, la
+\emph{seguridad}: la aplicación no debe introducir deliberadamente una nueva vía
+de exposición de secretos o datos sensibles. Segundo, la \emph{privacidad}: los
+escenarios de prueba usarán información sintética y no se solicitarán
+credenciales ni identificadores personales. Tercero, la \emph{usabilidad}: las
+respuestas deben incluir acciones claras, advertencias proporcionadas y una
+derivación inteligible. Cuarto, la \emph{trazabilidad}: ha de poder conocerse
+qué fuente o versión documental justifica cada respuesta evaluada. Quinto, la
+\emph{mantenibilidad}: las fuentes, instrucciones y pruebas deben poder
+actualizarse sin rediseñar por completo la interfaz.
+
+Los requisitos son una línea de base, no una garantía. En especial, la salida de
+un modelo generativo depende de la configuración de la plataforma, de las fuentes
+disponibles y de la formulación de la consulta. Por ello se mantendrá una lista
+de cambios de configuración para explicar qué versión se ha sometido a cada
+evaluación.
+
+\section{Metodología de investigación y desarrollo}
+\label{sec:metodologia}
+
+La metodología combina desarrollo iterativo y \emph{Design Science Research}
+(DSR). Este enfoque resulta apropiado porque la contribución principal es un
+artefacto informático y el conocimiento se obtiene al diseñarlo y evaluarlo en
+relación con un problema identificado. Hevner et al. sitúan la utilidad, el
+rigor y la evaluación como principios centrales de la investigación basada en
+diseño \cite{hevner2004}. Peffers et al. proponen un proceso compuesto por
+identificación del problema, definición de objetivos, diseño y desarrollo,
+demostración, evaluación y comunicación \cite{peffers2007}.
+
+En este TFM dichas etapas se adaptan de la siguiente manera:
+
+\begin{enumerate}
+  \item \textbf{Identificación del problema.} Se analizan las dudas frecuentes
+  de ciberseguridad y el coste de acceder a procedimientos dispersos. Se define
+  el supuesto de uso organizativo simulado y los riesgos que no deben delegarse
+  al agente.
+  \item \textbf{Objetivos de la solución.} Se fijan los requisitos de la
+  sección anterior, las categorías de consulta y los criterios de éxito. Se
+  prioriza una orientación prudente y trazable frente a la amplitud temática.
+  \item \textbf{Diseño y desarrollo.} Se estructura el conocimiento, se
+  configuran las instrucciones y flujos del agente, y se desarrolla la interfaz
+  Angular. Cada cambio relevante debe registrarse en un historial de versiones.
+  \item \textbf{Demostración.} Se ejecutan conversaciones representativas desde
+  el entorno configurado y desde la interfaz web. La demostración sirve para
+  comprobar integración y recorrido de usuario, no para inferir calidad general.
+  \item \textbf{Evaluación.} Se aplica el protocolo definido en la
+  Sección~\ref{sec:protocolo-evaluacion}, se clasifican los fallos y se realiza,
+  como mínimo, una iteración de mejora justificable.
+  \item \textbf{Comunicación.} Se documentan arquitectura, fuentes, controles,
+  resultados, limitaciones y material reproducible, distinguiendo siempre lo
+  observado de lo planificado.
+\end{enumerate}
+
+La ejecución será iterativa: una evaluación puede revelar que una fuente es
+ambigua, que una instrucción produce una respuesta excesivamente rígida o que una
+derivación no es comprensible. La corrección debe aplicarse a la causa más
+próxima que sea controlable ---por ejemplo, fuente, instrucción, flujo o
+interfaz--- y después verificarse con el mismo caso de prueba. No se debe
+eliminar un caso difícil para mejorar artificialmente una métrica.
+
+\section{Gestión de fuentes de conocimiento}
+\label{sec:gestion-fuentes}
+
+La calidad del conocimiento de entrada condiciona la calidad máxima esperable de
+una respuesta fundamentada. Para evitar que la base de conocimiento sea una
+colección opaca de enlaces, cada elemento incorporado debe registrarse con los
+siguientes atributos:
+
+\begin{itemize}
+  \item identificador, título, propietario y URL o ubicación;
+  \item categoría funcional cubierta y público objetivo;
+  \item fecha de publicación, fecha de última revisión conocida y fecha de
+  incorporación al agente;
+  \item estado de aprobación (candidato, aprobado, retirado) y responsable de la
+  decisión;
+  \item restricciones de acceso, idioma, licencia y datos que no deben incluirse;
+  y
+  \item casos de prueba asociados y versión del agente que la utiliza.
+\end{itemize}
+
+Se dará preferencia a fuentes primarias y mantenidas: marcos de NIST, informes de
+ENISA, recursos de INCIBE y documentación oficial de Microsoft. Cuando una
+política corporativa simulada contradiga una recomendación pública, el agente
+debe expresar la prioridad de la política en su contexto y, si la contradicción
+afecta a seguridad o legalidad, derivar a un responsable. Las fuentes web
+públicas dependen de la indexación y de restricciones de recuperación; Microsoft
+documenta que las fuentes públicas usan búsqueda basada en Bing y que existen
+límites de profundidad, por lo que su configuración debe validarse con consultas
+reales del conjunto de pruebas \cite{copilotPublicWeb}.
+
+Las instrucciones también son parte de la configuración que se debe versionar.
+Microsoft recomienda basarlas en herramientas y fuentes realmente configuradas,
+usar nombres exactos de los recursos cuando corresponda y probar los cambios de
+forma incremental \cite{copilotInstructions}. Tales recomendaciones no se
+interpretan como una garantía de que el agente seguirá siempre la instrucción:
+se contrastarán mediante casos de prueba.
+
+\section{Protocolo de evaluación}
+\label{sec:protocolo-evaluacion}
+
+El protocolo persigue obtener evidencia repetible sin emplear datos reales. Un
+\emph{caso de prueba} contiene, como mínimo, un identificador, categoría,
+pregunta, contexto sintético, respuesta o hechos esperados, fuente de referencia,
+criterio de aceptación, tipo de riesgo y resultado. Se conservará la transcripción
+completa y la fecha de ejecución; si la plataforma expone la información, también
+se registrará la fuente recuperada y la versión de configuración.
+
+La batería se organizará en las cinco familias de la
+Tabla~\ref{tab:familias-prueba-previstas}. Los ejemplos de la tabla son ilustrativos y no
+constituyen resultados. El número definitivo de casos, la fecha de ejecución y
+el identificador de versión quedan \textbf{pendientes de completar} al ejecutar
+la validación real.
+
+\begin{table}[H]
+\centering
+\caption{Familias de prueba previstas para la evaluación.}
+\label{tab:familias-prueba-previstas}
+\begin{tabular}{@{}p{0.22\textwidth}p{0.47\textwidth}p{0.23\textwidth}@{}}
+\hline
+\textbf{Familia} & \textbf{Propósito} & \textbf{Ejemplo de criterio}\\
+\hline
+Consulta directa & Verificar hechos y recomendaciones presentes en una fuente
+aprobada. & Incluye acciones correctas y fuente pertinente.\\
+Paráfrasis y ambigüedad & Comprobar robustez ante redacción distinta o información
+insuficiente. & Mantiene el sentido o pide una aclaración mínima.\\
+Incidente y escalado & Comprobar que informa, preserva el alcance y deriva sin
+simular una investigación. & No solicita secretos ni promete contención.\\
+Fuera de alcance & Verificar la abstención ante asuntos ajenos, jurídicos o no
+fundamentados. & Declara el límite y ofrece una alternativa segura.\\
+Robustez adversarial & Probar inyección de instrucciones, petición de secretos o
+peticiones ofensivas. & Rechaza, no revela configuración y reconduce.\\
+\hline
+\end{tabular}
+\end{table}
+
+Se combinarán evaluación humana y automatización cuando la plataforma lo permita.
+Copilot Studio permite crear conjuntos de prueba, comparar respuestas con
+expectativas o criterios de calidad y conservar el detalle de cada caso
+\cite{copilotEvaluation}. Esa capacidad es útil para repetir pruebas, pero no
+elimina la revisión humana: una puntuación agregada no sustituye la comprobación
+de que la fuente es pertinente, la recomendación es prudente y la derivación es
+apropiada.
+
+Para cada métrica binaria, si $n$ es el número de casos aplicables y $x_i$ vale
+uno cuando el caso $i$ cumple el criterio y cero en caso contrario, se informará
+la proporción de cumplimiento mediante:
+
+\begin{equation}
+M = \frac{1}{n}\sum_{i=1}^{n}x_i.
+\label{eq:metrica-binaria}
+\end{equation}
+
+La ecuación~\ref{eq:metrica-binaria} se aplicará, con su denominador claramente
+declarado, a las siguientes dimensiones:
+
+\begin{itemize}
+  \item \textbf{precisión}: proporción de respuestas cuyos hechos y acciones
+  esenciales concuerdan con la fuente de referencia;
+  \item \textbf{cobertura}: proporción de consultas de alcance que reciben una
+  respuesta suficiente, no sólo parcialmente correcta;
+  \item \textbf{trazabilidad}: proporción de respuestas que identifican una
+  fuente pertinente y verificable cuando el caso requiere fundamentación;
+  \item \textbf{consistencia}: proporción de pares de paráfrasis cuya
+  recomendación esencial no se contradice;
+  \item \textbf{abstención segura}: proporción de casos fuera de alcance o de
+  abuso que son rechazados o derivados correctamente; y
+  \item \textbf{utilidad}: valoración humana, con una rúbrica previamente
+  publicada, sobre claridad, accionabilidad y proporcionalidad de la respuesta.
+\end{itemize}
+
+Las métricas se presentarán junto con el numerador, denominador y lista de casos
+fallidos. No se comunicarán porcentajes sin el conjunto de pruebas, la fecha, la
+configuración y los criterios que permiten interpretarlos. Antes de iniciar la
+evaluación se fijarán umbrales de aceptación por familia de prueba; esos umbrales
+quedan \textbf{pendientes de aprobación} por el autor y el tutor, pues dependen
+del alcance final y del nivel de riesgo asumido.
+
+\section{Plan de trabajo y entregables}
+\label{sec:plan-trabajo}
+
+La propuesta inicial distribuye el trabajo en siete semanas. La
+Tabla~\ref{tab:plan-trabajo} expresa ese plan como una guía de ejecución, no como
+un registro de trabajo ya completado. Las fechas de inicio, fin y entrega deben
+anotarse cuando se acuerden con la dirección del TFM.
+
+\begin{table}[H]
+\centering
+\caption{Plan de trabajo previsto.}
+\label{tab:plan-trabajo}
+\begin{tabular}{@{}p{0.14\textwidth}p{0.56\textwidth}p{0.22\textwidth}@{}}
+\hline
+\textbf{Fase} & \textbf{Actividad principal} & \textbf{Evidencia esperada}\\
+\hline
+1 & Revisión de fuentes, estado del arte y definición de alcance. & Inventario de
+fuentes y requisitos.\\
+2 & Diseño de casos de uso, arquitectura y experiencia de interfaz. & Diagramas,
+decisiones y prototipos.\\
+3 & Configuración del agente y desarrollo de la aplicación Angular. & Artefacto
+ejecutable y configuración documentada.\\
+4 & Integración, pruebas, corrección y evaluación controlada. & Conjunto de
+pruebas, transcripciones y resultados.\\
+5 & Redacción, revisión de evidencia y preparación de defensa. & Memoria,
+anexos y demostración reproducible.\\
+\hline
+\end{tabular}
+\end{table}
+
+Los entregables incluyen el código fuente de la interfaz, la exportación o
+documentación versionada del agente, el inventario de conocimiento, la batería de
+pruebas, las evidencias de ejecución que no contengan información sensible y la
+memoria. Las claves, secretos, identificadores de tenant, tokens y transcripciones
+que contengan datos reales no deben formar parte del repositorio ni de los anexos
+públicos.
+
+\section{Aspectos éticos, de privacidad y amenazas a la validez}
+\label{sec:etica-validez}
+
+La experimentación utilizará consultas, nombres, dominios, mensajes y políticas
+ficticias. La regla operativa será no introducir en el agente datos personales,
+credenciales, direcciones de producción, evidencias de incidentes reales ni
+información que pueda ser aprovechada para atacar un sistema. Si durante la
+prueba una persona intenta aportar datos sensibles, la interfaz y las
+instrucciones deben recordarle que no lo haga y el resultado no debe conservarse
+sin revisión.
+
+El RGPD exige valorar la naturaleza, el alcance, el contexto y la finalidad del
+tratamiento para aplicar medidas acordes al riesgo \cite{gdpr}. El Reglamento de
+IA añade obligaciones y plazos que dependen del rol, el uso y la clasificación
+del sistema \cite{aiAct}. Por ello, una futura adopción real requeriría un
+análisis específico de protección de datos, contratos, retención de
+transcripciones, autenticación, roles, licencias y obligaciones regulatorias. El
+prototipo académico no debe presentarse como evidencia suficiente de esa
+conformidad.
+
+Las principales amenazas a la validez son las siguientes:
+
+\begin{itemize}
+  \item \textbf{Validez de constructo:} una respuesta puede parecer clara y, sin
+  embargo, omitir una acción crítica. La rúbrica debe separar estilo, exactitud,
+  cobertura y seguridad.
+  \item \textbf{Validez interna:} un cambio simultáneo de fuente, instrucción y
+  modelo impide atribuir una mejora a una causa concreta. Cada iteración debe
+  registrar sus modificaciones.
+  \item \textbf{Validez externa:} los casos sintéticos no representan todos los
+  contextos de una organización ni sustituyen pruebas con usuarios autorizados.
+  \item \textbf{Reproducibilidad:} las plataformas y modelos gestionados pueden
+  cambiar. La fecha, configuración disponible, fuentes y versiones reducen, pero
+  no eliminan, esa limitación.
+  \item \textbf{Sesgo del evaluador:} la revisión humana puede favorecer la
+  expectativa del autor. Cuando sea viable, se utilizará una rúbrica y una
+  segunda revisión independiente de una muestra de casos.
+\end{itemize}
+
+En consecuencia, las conclusiones deberán circunscribirse al artefacto, versión,
+fuentes y batería efectivamente evaluados. La ausencia de fallos en un conjunto
+finito de pruebas será evidencia de comportamiento en esos casos, no una prueba
+de seguridad absoluta.
+

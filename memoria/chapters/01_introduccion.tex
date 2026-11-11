@@ -1,0 +1,224 @@
+% Capítulo 1: archivo incluido desde main.tex mediante \input{chapters/01_introduccion}.
+\chapter{Introducción}
+\label{chap:introduccion}
+
+La ciberseguridad ha pasado de ser una preocupación estrictamente técnica a
+formar parte de la actividad cotidiana de cualquier organización. Las personas
+usuarias toman decisiones de seguridad cuando reciben un correo inesperado,
+comparten un fichero, eligen una contraseña, notifican una anomalía o utilizan
+un servicio en la nube. Sin embargo, la documentación corporativa y las guías
+de referencia suelen estar distribuidas entre políticas, procedimientos,
+portales y manuales con distintos niveles de detalle. Esta dispersión dificulta
+que una persona no especialista encuentre, en el momento oportuno, una
+orientación comprensible y coherente con las normas de su organización.
+
+El Marco de Ciberseguridad de NIST propone gestionar el riesgo mediante las
+funciones \emph{Govern}, \emph{Identify}, \emph{Protect}, \emph{Detect},
+\emph{Respond} y \emph{Recover}; la incorporación explícita de la función de
+gobierno en la versión 2.0 subraya que el problema no se limita a desplegar
+tecnología, sino que también exige decisiones, responsabilidades y comunicación
+organizativa \cite{nistCsf2024}. En paralelo, el informe de panorama de
+amenazas de ENISA muestra que el entorno europeo continúa expuesto a amenazas
+diversas y cambiantes, por lo que las recomendaciones operativas deben revisarse
+con frecuencia y contextualizarse \cite{enisaThreat2025}. Un canal de consulta
+de primer nivel no sustituye a un equipo de seguridad, pero puede reducir la
+fricción entre una duda habitual y el procedimiento que debe seguirse.
+
+Este Trabajo Fin de Máster aborda ese problema mediante el diseño e
+implementación de un agente conversacional especializado en ciberseguridad,
+configurado en Microsoft Copilot Studio e integrado en una interfaz web Angular.
+El agente se concibe como un sistema de apoyo informativo para consultas
+frecuentes en un escenario organizativo simulado: phishing, credenciales,
+protección de dispositivos, buenas prácticas, notificación de incidentes y
+consulta de políticas. La elección de una interfaz web permite ofrecer un punto
+de acceso independiente de la consola de administración del agente, mientras
+que Copilot Studio proporciona capacidades de conocimiento, orquestación y
+publicación que deben configurarse y gobernarse de forma explícita.
+
+\section{Contexto y planteamiento del problema}
+\label{sec:contexto-problema}
+
+Las consultas de ciberseguridad suelen tener una naturaleza situacional. Una
+pregunta como ``he recibido un correo con un enlace, ¿qué hago?'' no exige sólo
+definir el phishing: requiere proponer pasos prudentes, recordar que no se debe
+interactuar con el mensaje y dirigir a la persona al canal de notificación
+adecuado. INCIBE define el phishing como una técnica que suplanta a una entidad
+legítima para obtener información, realizar cargos o infectar un dispositivo
+\cite{incibePhishing}. En un entorno de trabajo, la respuesta útil debe ser
+breve, accionable y compatible con la política interna, sin convertir al agente
+en un sustituto de la gestión de incidentes.
+
+La literatura y las guías operativas de respuesta a incidentes refuerzan esta
+distinción. NIST sitúa la respuesta ante incidentes dentro de la gestión continua
+del riesgo y persigue mejorar la preparación, detección, respuesta y recuperación
+\cite{nistIncident2025}. Por su parte, la guía de INCIBE para pymes recomienda
+definir responsables, canales de notificación, procedimientos, registro de
+evidencias y mecanismos de mejora continua \cite{incibeCrisis}. Por tanto, el
+agente propuesto no debe ejecutar acciones de contención, investigar sistemas ni
+decidir la severidad de un incidente real. Su papel es orientar, pedir sólo el
+contexto mínimo imprescindible, advertir de los límites y derivar a los canales
+humanos establecidos.
+
+Los modelos de lenguaje son atractivos para este caso de uso porque pueden
+interpretar múltiples formulaciones de una misma necesidad y producir una
+explicación en lenguaje natural. No obstante, esa flexibilidad no garantiza que
+la respuesta sea correcta. El perfil de inteligencia artificial generativa del
+AI RMF identifica la \emph{confabulación} como la producción de contenido
+erróneo o falso presentado con confianza, y considera también los riesgos de
+privacidad, seguridad de la información y configuración humano--IA
+\cite{nistGenAi2024}. Una respuesta plausible pero equivocada sobre un posible
+incidente puede inducir acciones inadecuadas o una falsa sensación de seguridad.
+
+La estrategia adoptada para mitigar este riesgo es fundamentar las respuestas en
+un conjunto acotado de fuentes de conocimiento revisadas. La generación
+aumentada por recuperación, conocida como RAG por sus siglas en inglés, combina
+la generación del modelo con una memoria documental externa; Lewis et al.
+plantean este enfoque para tareas intensivas en conocimiento y señalan su valor
+para acceder a información explícita y actualizable \cite{lewis2020rag}. En el
+presente trabajo no se pretende entrenar un modelo RAG desde cero. Se emplearán
+las capacidades de recuperación y fuentes de conocimiento disponibles en Copilot
+Studio, aplicando criterios de selección, versionado y trazabilidad de las
+fuentes.
+
+\section{Motivación y oportunidad}
+\label{sec:motivacion}
+
+El proyecto se justifica por tres motivos. En primer lugar, la disponibilidad de
+una ayuda conversacional puede facilitar la concienciación y orientar a las
+personas hacia los recursos existentes sin obligarlas a conocer de antemano la
+estructura documental de la organización. En segundo lugar, el caso permite
+estudiar de forma práctica el equilibrio entre utilidad, seguridad y control en
+un sistema basado en IA generativa. Finalmente, integra dos ámbitos habituales
+en un desarrollo de ciberseguridad: la configuración segura de un servicio
+gestionado y la construcción de una aplicación web que lo expone a usuarios.
+
+La solución propuesta persigue mejorar la localización y la comprensión de
+conocimiento fiable; no persigue automatizar decisiones de alto impacto. Cuando
+la información disponible no permita una respuesta suficientemente fundamentada,
+el comportamiento deseado será reconocer la incertidumbre y recomendar la
+consulta con el equipo responsable. Esta propiedad es especialmente relevante
+frente al riesgo de sobreconfianza de los usuarios en las respuestas de modelos
+generativos, recogido tanto por NIST como por las guías de seguridad para
+aplicaciones con modelos de lenguaje \cite{nistGenAi2024,owaspLlm2026}.
+
+\section{Pregunta de trabajo}
+\label{sec:pregunta-trabajo}
+
+La pregunta central que guía el TFM es la siguiente:
+
+\begin{quote}
+\emph{¿Cómo puede diseñarse e integrarse un agente conversacional de
+ciberseguridad, fundamentado en fuentes reconocidas, que ofrezca orientación
+útil y trazable sobre consultas frecuentes sin reemplazar los procesos humanos
+de gestión de incidentes?}
+\end{quote}
+
+De ella se derivan tres cuestiones operativas:
+
+\begin{enumerate}
+  \item ¿Qué casos de uso, fuentes y límites de actuación deben definirse antes
+  de configurar el agente?
+  \item ¿Qué controles de diseño reducen el riesgo de respuestas no
+  fundamentadas, divulgación de información sensible o instrucciones fuera de
+  alcance?
+  \item ¿Cómo debe evaluarse la calidad de las respuestas de forma repetible,
+  separando precisión, cobertura, trazabilidad, consistencia y utilidad?
+\end{enumerate}
+
+Estas cuestiones transforman el proyecto en algo más que una demostración de
+conversación: el artefacto se diseña junto con un protocolo de evaluación y una
+argumentación de seguridad. La metodología elegida se desarrolla en el
+Capítulo~\ref{chap:objetivos-metodologia}.
+
+\section{Alcance}
+\label{sec:alcance}
+
+El alcance funcional previsto se limita a un escenario organizativo simulado y
+a consultas de carácter defensivo y educativo. Las categorías iniciales son las
+siguientes:
+
+\begin{itemize}
+  \item identificación y comunicación inicial de correos, enlaces o adjuntos
+  sospechosos;
+  \item gestión de contraseñas, autenticación multifactor y protección de
+  cuentas;
+  \item pautas básicas para dispositivos, actualizaciones, copias de seguridad y
+  uso seguro de servicios corporativos;
+  \item orientación inicial ante señales de incidente y derivación al canal de
+  notificación; y
+  \item explicación de políticas corporativas simuladas y de fuentes públicas
+  seleccionadas.
+\end{itemize}
+
+La base de conocimiento se compondrá de documentos o sitios oficiales de NIST,
+ENISA, INCIBE y Microsoft Learn, complementados, si procede, por una política
+corporativa ficticia creada expresamente para las pruebas. Cada fuente deberá
+tener propietario, URL o identificador, fecha de revisión, alcance temático y
+estado de aprobación. Las fuentes públicas no se tratarán como evidencia
+inmutable: deberán revisarse antes de cada versión evaluada, ya que las guías,
+las plataformas y el panorama de amenazas evolucionan.
+
+Quedan fuera del alcance los siguientes aspectos:
+
+\begin{itemize}
+  \item la monitorización de sistemas, el análisis forense, la ejecución de
+  comandos, la respuesta automática ante incidentes o el acceso a herramientas
+  de seguridad;
+  \item la recepción o tratamiento intencionado de credenciales, secretos,
+  registros de producción, datos personales reales o información clasificada;
+  \item las instrucciones ofensivas que puedan facilitar intrusión, evasión,
+  malware o exfiltración;
+  \item la sustitución de un SOC, de un CSIRT, de los responsables de protección
+  de datos o de asesoramiento jurídico; y
+  \item la afirmación de conformidad legal o certificación de seguridad de una
+  organización real.
+\end{itemize}
+
+Esta delimitación es deliberada. El agente debe indicar que, ante un riesgo
+inmediato o una posible brecha, la persona usuaria ha de seguir el procedimiento
+organizativo y contactar con el equipo responsable. Si no existe tal
+procedimiento en el entorno de demostración, el texto de derivación se marcará
+como un elemento configurable, no como una instrucción universal.
+
+\section{Consideraciones de seguridad, privacidad y gobierno}
+\label{sec:consideraciones-intro}
+
+El sistema integra dos superficies que requieren atención: el comportamiento del
+agente y la aplicación web que lo presenta. Entre los riesgos característicos de
+las aplicaciones con modelos de lenguaje se encuentran la inyección de
+instrucciones, la divulgación de información sensible, la contaminación de datos
+y la dependencia excesiva de las salidas del modelo \cite{owaspLlm2026}. En
+consecuencia, las instrucciones del agente deben priorizar fuentes aprobadas,
+prohibir la solicitud de secretos, limitar la respuesta a su dominio y disponer
+de rutas de rechazo o escalado.
+
+En el plano web, Angular ofrece mecanismos de protección frente a XSS al tratar
+los valores de las plantillas como no confiables y recomienda mantener el
+framework actualizado, evitar APIs de riesgo y complementar las defensas con una
+política de seguridad de contenido y \emph{Trusted Types} cuando sea aplicable
+\cite{angularSecurity}. Estas medidas no sustituyen a la autenticación,
+autorización, protección de secretos ni validación del lado servidor; forman
+parte de una defensa en profundidad que se concretará durante la implementación.
+
+El Reglamento General de Protección de Datos exige que el tratamiento de datos
+personales se realice con medidas técnicas y organizativas adecuadas al riesgo
+\cite{gdpr}. Además, el Reglamento europeo de IA establece un marco armonizado
+para el desarrollo y uso de sistemas de IA orientado a una IA fiable y centrada
+en las personas \cite{aiAct}. Este TFM no emite un dictamen de cumplimiento.
+Sí incorpora esos marcos como criterios de diseño: minimización de datos,
+transparencia sobre las limitaciones, supervisión humana y documentación de las
+decisiones de configuración.
+
+\section{Estructura de la memoria}
+\label{sec:estructura-memoria}
+
+El Capítulo~\ref{chap:objetivos-metodologia} define los objetivos, requisitos,
+metodología y protocolo de evaluación. El Capítulo~\ref{chap:estado-arte}
+revisa los fundamentos de agentes con recuperación de conocimiento, Microsoft
+Copilot Studio, seguridad de aplicaciones web y gobierno de IA. Los capítulos
+posteriores describirán la arquitectura implementada, la configuración del
+agente, la integración con Angular y las decisiones de seguridad. A continuación
+se documentará la validación mediante casos de prueba sintéticos y sus resultados
+reproducibles. Por último, las conclusiones contrastarán los objetivos con la
+evidencia obtenida y propondrán mejoras para un posible despliegue organizativo.
+

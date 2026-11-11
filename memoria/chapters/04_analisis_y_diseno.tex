@@ -1,0 +1,149 @@
+\chapter{An\'alisis de requisitos y dise\~no seguro}
+\label{chap:diseno}
+
+Este cap\'itulo concreta el artefacto propuesto y las decisiones necesarias para que su uso sea responsable. El objetivo no es construir un sistema que sustituya a un analista de seguridad ni a un equipo de respuesta a incidentes, sino un punto de consulta de primer nivel, trazable y de solo lectura. La delimitaci\'on es especialmente importante: una respuesta fluida de un modelo generativo no debe confundirse con una recomendaci\'on t\'ecnica verificada. El dise\~no se alinea con la gesti\'on de riesgos descrita en el AI RMF de NIST \cite{nistAiRmf2023,nistGenAi2024} y con las funciones de gobernanza del CSF 2.0 \cite{nistCsf2024}.
+
+\section{Contexto de uso, alcance y partes interesadas}
+
+El usuario objetivo es una persona de una organizaci\'on o un estudiante con conocimientos de inform\'atica generales, pero sin especializaci\'on en ciberseguridad. Formula dudas sobre mensajes sospechosos, contrase\~nas, autenticaci\'on multifactor, actualizaciones, dispositivos, navegaci\'on segura o la forma de comunicar un incidente. El agente debe responder en espa\~nol claro, estructurado y con referencias; cuando la pregunta necesite datos que no posee, debe pedir contexto o derivar a un canal humano.
+
+La tabla \ref{tab:alcance} delimita el producto. Esta frontera reduce la superficie de riesgo y permite evaluar el comportamiento frente a una especificaci\'on concreta.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Alcance funcional y exclusiones del agente.}
+\label{tab:alcance}
+\begin{tabularx}{\textwidth}{p{0.22\textwidth}X}
+\toprule
+\textbf{Incluido} & \textbf{Excluido o derivado}\\
+\midrule
+Concienciaci\'on, buenas pr\'acticas, identificaci\'on inicial de phishing, contrase\~nas, MFA, actualizaciones y navegaci\'on segura. & Direcci\'on de una respuesta a incidentes real, an\'alisis forense, erradicaci\'on, recuperaci\'on o decisiones de continuidad de negocio.\\
+Orientaci\'on de primer nivel ante un posible incidente: preservar evidencia, desconectar cuando proceda y notificar por el canal establecido. & Solicitudes de acceso no autorizado, explotaci\'on, evasi\'on de controles, desarrollo de malware o instrucciones operativas ofensivas.\\
+Consulta sobre pol\'iticas simuladas cargadas en el corpus y fuentes institucionales versionadas. & Interpretaci\'on jur\'idica, asesoramiento m\'edico, financiero o decisiones sobre personas.\\
+Respuesta con cita, advertencia de vigencia y una ruta de escalado. & Recogida de contrase\~nas, claves API, datos personales, registros sensibles o informaci\'on de incidentes reales.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Las partes interesadas son: (i) el usuario final, que necesita una respuesta comprensible; (ii) el responsable de seguridad, que aprueba el corpus y las rutas de escalado; (iii) el propietario de la plataforma, que administra Copilot Studio, el canal y las pol\'iticas de prevenci\'on de p\'erdida de datos; (iv) el tutor acad\'emico y los evaluadores, que revisan la trazabilidad metodol\'ogica; y (v) el desarrollador, responsable de la integraci\'on web y de no exponer secretos. La separaci\'on de responsabilidades evita que el agente adquiera privilegios administrativos o acceso a sistemas corporativos.
+
+\section{Requisitos}
+
+Los requisitos se formularon a partir de los casos de uso de la propuesta, las gu\'ias institucionales de ciberseguridad y los riesgos propios de los sistemas generativos. Se emplea el prefijo \texttt{RF} para requisitos funcionales y \texttt{RNF} para requisitos no funcionales.
+
+\begin{longtable}{p{0.12\textwidth}p{0.31\textwidth}p{0.47\textwidth}}
+\caption{Requisitos verificables del sistema.}\label{tab:requisitos}\\
+\toprule
+\textbf{ID} & \textbf{Requisito} & \textbf{Criterio de aceptaci\'on}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Requisito} & \textbf{Criterio de aceptaci\'on}\\
+\midrule
+\endhead
+RF-01 & Contestar consultas dentro de los dominios definidos. & La respuesta identifica el tema y ofrece pasos prudentes y comprensibles.\\
+RF-02 & Mostrar la procedencia del conocimiento. & Toda afirmaci\'on factual relevante incluye una cita o un enlace a la fuente aprobada cuando el canal lo permita.\\
+RF-03 & Gestionar ambig\"uedad y falta de cobertura. & El agente pide la m\'inima aclaraci\'on necesaria o se abstiene con una derivaci\'on concreta.\\
+RF-04 & Dar una orientaci\'on segura ante posible incidente. & No solicita secretos; prioriza el canal de notificaci\'on y evita instrucciones destructivas.\\
+RF-05 & Recoger feedback no sensible. & La interfaz permite valorar utilidad y reportar una respuesta problem\'atica sin enviar la transcripci\'on por defecto.\\
+RNF-01 & Proteger credenciales y tokens. & El secreto Direct Line reside exclusivamente en el servicio servidor; no aparece en el cliente, Git ni los registros.\\
+RNF-02 & Limitar abuso y consumo. & La API valida origen, tama\~no de solicitud y aplica limitaci\'on de tasa.\\
+RNF-03 & Trazabilidad y reproducibilidad. & El inventario del corpus conserva URL, versi\'on, fecha de revisi\'on, huella y responsable.\\
+RNF-04 & Accesibilidad y claridad. & La interfaz usa etiquetas sem\'anticas, contraste suficiente, foco visible y mensajes de estado.\\
+RNF-05 & Privacidad por dise\~no. & Se minimizan los datos, se informa de que es IA y se rechaza introducir credenciales o datos personales.\\
+RNF-06 & Mantenibilidad. & La configuraci\'on del agente, el corpus, la aplicaci\'on y los casos de prueba se versionan de forma independiente.\\
+\bottomrule
+\end{longtable}
+
+\section{Arquitectura de referencia}
+
+La arquitectura separa estrictamente la experiencia de usuario, el servicio de integraci\'on y el agente. El navegador nunca recibe el secreto del canal. En su lugar, solicita al backend un token de conversaci\'on de vida limitada, que se usa para inicializar el canal Direct Line. Esta decisi\'on sigue la gu\'ia de Microsoft para conectar un agente a una aplicaci\'on personalizada \cite{copilotDirectLine,copilotWebSecurity}. La figura \ref{fig:arquitectura} resume el flujo.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=7mm and 5mm,
+  component/.style={draw, rounded corners, align=center, minimum height=12mm, minimum width=29mm, text width=27mm, fill=blue!7},
+  security/.style={draw, rounded corners, align=center, minimum height=12mm, minimum width=29mm, text width=27mm, fill=green!10},
+  datastore/.style={draw, rounded corners, align=center, minimum height=12mm, minimum width=29mm, text width=27mm, fill=orange!13},
+  arrow/.style={thick}
+]
+\node[component] (user) {Usuario};
+\node[component, right=of user] (angular) {Aplicaci\'on Angular\\Interfaz accesible};
+\node[security, right=of angular] (bff) {BFF Node/Express\\Tokens y controles};
+\node[component, below=of bff] (copilot) {Agente Copilot Studio\\Orquestaci\'on y temas};
+\node[datastore, below=of copilot] (kb) {Corpus curado\\INCIBE, ENISA, NIST\\y Microsoft Learn};
+\node[datastore, below=of angular] (evidence) {M\'etricas m\'inimas\\y feedback agregado};
+\draw[arrow] (user) -- (angular);
+\draw[arrow] (angular) -- (bff);
+\draw[arrow] (bff) -- node[right, font=\scriptsize]{Direct Line} (copilot);
+\draw[arrow] (copilot) -- (kb);
+\draw[arrow] (angular) -- (evidence);
+\end{tikzpicture}
+\caption{Arquitectura l\'ogica del prototipo. Las l\'ineas representan flujos controlados; el secreto del canal no atraviesa la frontera del navegador.}
+\label{fig:arquitectura}
+\end{figure}
+
+El agente se configura con orquestaci\'on generativa para consultas informativas y temas deterministas para conductas de alto impacto, tales como la derivaci\'on ante incidentes, el rechazo de peticiones ofensivas y la explicaci\'on de l\'imites. Microsoft recomienda los flujos deterministas cuando un procedimiento debe seguir pasos exactos \cite{copilotOrchestration}. La configuraci\'on no incorpora herramientas que escriban datos, ejecuten acciones ni conectores administrativos; por tanto, el artefacto posee una capacidad deliberadamente limitada.
+
+\section{Gobierno del corpus}
+
+La calidad de una respuesta depende tanto de la recuperaci\'on como de la redacci\'on. Por ello, el corpus no se trata como una colecci\'on informal de enlaces. Cada fuente recibe un identificador, autoridad, versi\'on, fecha de consulta, dominio tem\'atico, responsable de aprobaci\'on y fecha de pr\'oxima revisi\'on. Las fuentes de referencia seleccionadas se sit\'uan en el primer o segundo nivel de la jerarqu\'ia: normativa y publicaciones oficiales, organismos p\'ublicos y documentaci\'on oficial del fabricante. Los blogs y resultados de b\'usqueda no se usan como conocimiento base.
+
+\begin{table}[H]
+\centering
+\small
+\caption{N\'ucleo del corpus inicial y finalidad.}
+\label{tab:corpus}
+\begin{tabularx}{\textwidth}{p{0.22\textwidth}p{0.19\textwidth}X}
+\toprule
+\textbf{Fuente} & \textbf{Dominio} & \textbf{Uso previsto}\\
+\midrule
+NIST CSF 2.0 \cite{nistCsf2024} & Gobierno de ciberseguridad & Terminolog\'ia, funciones de gobernanza y marco de referencia.\\
+NIST SP 800-61r3 \cite{nistIncident2025} & Incidentes & Orientaci\'on prudente y derivaci\'on; no automatizaci\'on de respuesta.\\
+INCIBE \cite{incibeCrisis} & Concienciaci\'on empresarial & Casos y recomendaciones en espa\~nol para usuarios no especialistas.\\
+ENISA Threat Landscape \cite{enisaThreat2025} & Amenazas y contexto & Priorizaci\'on de riesgos y actualizaci\'on de tendencias.\\
+Microsoft Learn \cite{copilotKnowledge} & Plataforma & L\'imites t\'ecnicos, fuentes de conocimiento y configuraci\'on de Copilot Studio.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Para asegurar la reproducibilidad de la evaluaci\'on, la configuraci\'on de pruebas usa un corpus cerrado y versionado. La b\'usqueda web abierta se mantiene desactivada durante el experimento porque podr\'ia introducir contenido no revisado y cambiar entre ejecuciones. Las fuentes web p\'ublicas deben asimismo ser evaluadas considerando que una consulta puede ser reescrita y remitida a Bing, seg\'un la documentaci\'on de la plataforma \cite{copilotPublicWeb}. Este hecho obliga a advertir al usuario de que no debe introducir informaci\'on sensible.
+
+\section{Modelo de amenazas y controles}
+
+El modelo se centra en los riesgos de la aplicaci\'on web, del agente y del ciclo de vida del conocimiento. Se adoptan categor\'ias del OWASP Top 10 para aplicaciones LLM \cite{owaspLlm2026}, complementadas con controles convencionales de desarrollo seguro. La tabla \ref{tab:amenazas} no pretende demostrar ausencia de riesgo; expone qu\'e controles son verificables y qu\'e evidencia se debe conservar.
+
+\begin{longtable}{p{0.22\textwidth}p{0.25\textwidth}p{0.40\textwidth}}
+\caption{Amenazas principales y mitigaciones.}\label{tab:amenazas}\\
+\toprule
+\textbf{Amenaza} & \textbf{Escenario} & \textbf{Control y evidencia}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Amenaza} & \textbf{Escenario} & \textbf{Control y evidencia}\\
+\midrule
+\endhead
+Inyecci\'on de instrucciones & Un usuario o documento intenta cambiar el prop\'osito del agente. & Instrucciones no modificables, corpus revisado, temas de rechazo y conjunto adversario de pruebas. No se guardan secretos en el prompt.\\
+Divulgaci\'on de datos & El usuario introduce una contrase\~na, token o detalle de incidente. & Mensaje preventivo, minimizaci\'on de datos, redacci\'on de logs y ausencia de conectores con datos internos.\\
+Exceso de agencia & El agente ejecuta acciones o modifica sistemas. & Dise\~no de solo lectura, sin acciones de Power Automate ni herramientas privilegiadas; verificaci\'on de configuraci\'on.\\
+Envenenamiento del corpus & Un documento no confiable incorpora instrucciones ocultas. & Alta manual, origen autorizado, revisi\'on humana, hash, versionado y entorno de pruebas aislado.\\
+Exposici\'on de secreto Direct Line & La SPA contiene el secreto de canal. & BFF con variables de entorno, tokens ef\'imeros, exclusi\'on de \texttt{.env} del control de versiones y prueba de b\'usqueda de secretos.\\
+XSS o manejo inseguro de salida & Un mensaje contiene HTML o enlaces maliciosos. & Interpolaci\'on y sanitizaci\'on por defecto de Angular; no usar APIs de confianza manual sin justificaci\'on; CSP y validaci\'on de enlaces \cite{angularSecurity}.\\
+Consumo no acotado & Automatizaci\'on de peticiones o entradas excesivas. & L\'imites de tama\~no, tasa por IP/identidad, cuota de plataforma y telemetr\'ia agregada.\\
+Desinformaci\'on & Respuesta veros\'imil pero incorrecta o desactualizada. & Corpus institucional, citas, fecha de revisi\'on, abstenci\'on y muestreo humano de evaluaci\'on.\\
+\bottomrule
+\end{longtable}
+
+\section{Privacidad y consideraciones \`eticas}
+
+El principio de minimizaci\'on implica que no se piden ni se requieren datos personales para una consulta gen\'erica. Si se habilita autenticaci\'on corporativa, la identidad se trata exclusivamente en la capa definida por el responsable del tratamiento y nunca se reutiliza como conocimiento del modelo. La interfaz declara de forma visible que el usuario conversa con un sistema de IA, sus l\'imites y la recomendaci\'on de verificar informaci\'on relevante. Estas decisiones se relacionan con el RGPD \cite{gdpr} y con las obligaciones de transparencia del Reglamento de Inteligencia Artificial \cite{aiAct}.
+
+No se reclutan participantes ni se recopilan transcripciones reales como parte de este prototipo. Un futuro estudio de usabilidad deber\'a contar con informaci\'on previa, consentimiento, minimizaci\'on de datos, mecanismo de retirada y aprobaci\'on institucional cuando corresponda. En particular, una puntuaci\'on alta de utilidad no autoriza a desplazar la responsabilidad humana en decisiones de seguridad.
+
+\section{Criterios de dise\~no de la interfaz}
+
+La interfaz Angular presenta el agente como una ayuda y no como una autoridad. Antes de abrir la conversaci\'on muestra ejemplos seguros, una advertencia de no compartir secretos y un acceso a la pol\'itica de uso. El dise\~no evita patrones que induzcan a sobreconfianza: no asigna un nombre humano al agente, no usa mensajes de certeza cuando no hay fuente y permite enviar feedback. Tambi\'en ofrece estados expl\'icitos para el modo de demostraci\'on y para la indisponibilidad del canal, de forma que una respuesta de prueba no se confunda con una respuesta de Copilot Studio.
+
+Estas elecciones transforman principios abstractos de seguridad en propiedades observables del artefacto. El cap\'itulo siguiente describe su materializaci\'on t\'ecnica.

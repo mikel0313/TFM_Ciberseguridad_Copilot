@@ -1,0 +1,19 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Comprobaciones locales ejecutadas sobre la versi\'on entregada el 18 de octubre de 2026.}
+\label{tab:resultados-locales}
+\begin{tabularx}{\textwidth}{p{0.43\textwidth}p{0.20\textwidth}X}
+\toprule
+\textbf{Comprobaci\'on} & \textbf{Estado} & \textbf{Interpretaci\'on}\\
+\midrule
+Compilaci\'on del cliente Angular & Superada & La compilaci\'on de producci\'on gener\'o el paquete del cliente sin errores.\\
+Pruebas del BFF & 6/6 superadas & Verifican salud, origen permitido, bloqueo de origen ajeno, modo seguro sin secreto, token ef\'imero y configuraci\'on de producci\'on.\\
+Escaneo de secretos en cliente & 0 coincidencias & \texttt{DIRECT\_LINE\_SECRET} no aparece en el c\'odigo fuente del cliente.\\
+Auditor\'ia de dependencias & 0 vulnerabilidades altas & \texttt{npm audit --omit=dev --audit-level=high} no devolvi\'o vulnerabilidades.\\
+Prueba de modo demostraci\'on & Superada & Se comprob\'o visualmente la etiqueta de demo y una respuesta reproducible sin conexi\'on externa.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Estas salidas verifican propiedades de integraci\'on y de seguridad del c\'odigo. Una compilaci\'on correcta no equivale a una evaluaci\'on de exactitud de las respuestas del agente.
